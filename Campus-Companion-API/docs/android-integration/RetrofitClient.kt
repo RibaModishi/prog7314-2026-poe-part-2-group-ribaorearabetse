@@ -16,15 +16,16 @@ import java.util.concurrent.TimeUnit
  * Copy into your Android app and adjust the package name + BASE_URL.
  *
  * BASE_URL notes:
- *  - Android Emulator hitting a Ktor server running on your PC: use "http://10.0.2.2:8080/"
+ *  - Android Emulator hitting a Ktor server running on your PC: use "http://10.0.2.2:8090/"
  *    (10.0.2.2 is the emulator's alias for your machine's localhost - "localhost" from
- *    the emulator points at the emulator itself, not your PC).
- *  - Physical device on the same Wi-Fi as your PC: use "http://<your-pc-lan-ip>:8080/"
+ *    the emulator points at the emulator itself, not your PC). 8090 is the API's
+ *    default local port (see AppConfig.kt / README) - adjust if you set $PORT differently.
+ *  - Physical device on the same Wi-Fi as your PC: use "http://<your-pc-lan-ip>:8090/"
  *  - Once Khumo deploys the API (Cloud Run/Render), swap this for the real HTTPS URL.
  */
 object RetrofitClient {
 
-    private const val BASE_URL = "http://10.0.2.2:8080/" // TODO: replace with deployed URL when available
+    private const val BASE_URL = "http://10.0.2.2:8090/" // TODO: replace with deployed URL when available
 
     /**
      * Adds "Authorization: Bearer <firebase-id-token>" to every outgoing request.

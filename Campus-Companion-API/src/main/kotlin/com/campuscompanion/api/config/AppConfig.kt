@@ -10,9 +10,15 @@ package com.campuscompanion.api.config
  */
 object AppConfig {
 
-    /** Port the Ktor server listens on. */
+    /**
+     * Port the Ktor server listens on. Defaults to 8090 rather than the more
+     * conventional 8080, because 8080 is very commonly already taken on dev
+     * machines (Docker Desktop, Tomcat, Jenkins, etc. all default to it).
+     * Hosted platforms (Cloud Run, Render, Railway) always inject their own
+     * $PORT value at deploy time, so this default only matters for local runs.
+     */
     val port: Int
-        get() = System.getenv("PORT")?.toIntOrNull() ?: 8080
+        get() = System.getenv("PORT")?.toIntOrNull() ?: 8090
 
     /**
      * Path to the Firebase service-account JSON credentials file.

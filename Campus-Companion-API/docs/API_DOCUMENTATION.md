@@ -2,7 +2,7 @@
 
 Owner: Khumo-Thato Chabeli (Backend, Database, Authentication & API)
 
-Base URL (local): `http://localhost:8090` (port configurable via the `PORT` env var; default `8080`)
+Base URL (local): `http://localhost:8090` (port configurable via the `PORT` env var; default `8090`)
 
 ## Authentication
 

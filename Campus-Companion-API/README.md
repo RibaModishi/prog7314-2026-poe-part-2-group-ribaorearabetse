@@ -70,7 +70,7 @@ A placeholder showing the expected shape is at
 
 | Variable                  | Default                          | Purpose |
 |----------------------------|-----------------------------------|---------|
-| `PORT`                    | `8080`                            | Server port |
+| `PORT`                    | `8090`                            | Server port |
 | `FIREBASE_CREDENTIALS_PATH`| `firebase-service-account.json`  | Path to the service-account JSON |
 | `FIREBASE_PROJECT_ID`     | `campus-companion-d4052`          | Firebase project ID (diagnostics/logging) |
 | `ALLOWED_CORS_ORIGINS`    | `*`                                | Comma-separated allowed origins, or `*` |
@@ -88,10 +88,10 @@ A placeholder showing the expected shape is at
 ./gradlew run
 ```
 
-The server starts on `http://localhost:8080` (or `$PORT`). Confirm it's healthy:
+The server starts on `http://localhost:8090` (or `$PORT`). Confirm it's healthy:
 
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:8090/health
 ```
 
 - `"status": "ok"` → Firebase is configured correctly.
@@ -131,7 +131,7 @@ Safe to re-run — it skips seeding a collection that's already non-empty.
 ## Testing the API
 
 1. Import [`postman/CampusCompanion.postman_collection.json`](postman/CampusCompanion.postman_collection.json) into Postman.
-2. Set the collection variables `baseUrl` (e.g. `http://localhost:8080`) and `idToken`
+2. Set the collection variables `baseUrl` (e.g. `http://localhost:8090`) and `idToken`
    (see above).
 3. Run requests top-to-bottom; save a screenshot of each folder's results (or use
    Postman's "Run Collection" for one combined report) as your API-testing evidence.

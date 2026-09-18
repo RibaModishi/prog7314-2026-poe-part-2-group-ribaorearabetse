@@ -96,8 +96,8 @@ you don't need to write custom parsing per screen.
 
 Until this is deployed, run the API locally on my/your machine (`./gradlew run`) and
 point `RetrofitClient.BASE_URL` at:
-- `http://10.0.2.2:8080/` if you're using the Android **emulator** on the same PC running the API
-- `http://<pc-lan-ip>:8080/` if you're testing on a **physical phone** on the same Wi-Fi
+- `http://10.0.2.2:8090/` if you're using the Android **emulator** on the same PC running the API
+- `http://<pc-lan-ip>:8090/` if you're testing on a **physical phone** on the same Wi-Fi
 
 I'll update this once the API has a real deployed URL (Cloud Run/Render — see
 README "Deployment" section) so you're not dependent on my laptop being on.
@@ -158,6 +158,6 @@ request → call your logic → respond).
 ## Questions / blockers
 
 If anything here doesn't match what you expected from the Planning & Design doc, or
-you need an endpoint that doesn't exist yet, tell Khumo directly rather than working
+you need an endpoint that doesn't exist yet, tell me directly rather than working
 around it in your own layer — it's a 10-minute add on the API side and keeps
 everyone's Firestore schema consistent.
