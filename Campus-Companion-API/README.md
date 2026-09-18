@@ -10,6 +10,7 @@ talks to Firestore directly, it only talks to this API.
 - **Auth:** Firebase Authentication (email/password); every user-scoped request is
   verified server-side via a Firebase ID token
 - **Full endpoint reference:** [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)
+- **Handover doc for the rest of the team:** [`docs/HANDOVER.md`](docs/HANDOVER.md) (Riba: business logic/testing, Khensani: Android/Retrofit integration kit)
 
 ## Architecture at a glance
 
