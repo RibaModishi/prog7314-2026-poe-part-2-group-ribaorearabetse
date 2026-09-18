@@ -1,0 +1,208 @@
+{
+  "info": {
+    "name": "Campus Companion API",
+    "description": "Postman collection covering every endpoint owned by Khumo's Backend/Database/Auth/API part. Set the {{baseUrl}} and {{idToken}} collection variables before running. See README.md 'Testing the API' for how to obtain a Firebase ID token for {{idToken}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8090" },
+    { "key": "idToken", "value": "REPLACE_WITH_FIREBASE_ID_TOKEN" },
+    { "key": "locationId", "value": "" },
+    { "key": "eventId", "value": "" },
+    { "key": "favouriteId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+        }
+      ]
+    },
+    {
+      "name": "Auth & Profile",
+      "item": [
+        {
+          "name": "POST /api/auth/profile (create/update profile)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{idToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/auth/profile",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Khumo-Thato Chabeli\",\n  \"email\": \"student@example.ac.za\",\n  \"preferredLanguage\": \"en\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /api/users/me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{idToken}}" }],
+            "url": "{{baseUrl}}/api/users/me"
+          }
+        },
+        {
+          "name": "PUT /api/users/me/settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{idToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/users/me/settings",
+            "body": { "mode": "raw", "raw": "{\n  \"preferredLanguage\": \"zu\"\n}" }
+          }
+        },
+        {
+          "name": "GET /api/users/me (no auth header -> 401)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/users/me" }
+        }
+      ]
+    },
+    {
+      "name": "Locations",
+      "item": [
+        {
+          "name": "GET /api/locations",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/locations" }
+        },
+        {
+          "name": "GET /api/locations?category=STUDY_SPACE",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/locations?category=STUDY_SPACE" }
+        },
+        {
+          "name": "GET /api/locations/{id}",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/locations/{{locationId}}" }
+        },
+        {
+          "name": "GET /api/locations?category=NOT_REAL (expect 400)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/locations?category=NOT_REAL" }
+        },
+        {
+          "name": "POST /api/locations (seed/admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/locations",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Test Location\",\n  \"category\": \"CHILL_SPOT\",\n  \"description\": \"Created from Postman for API testing evidence\",\n  \"latitude\": -29.85,\n  \"longitude\": 31.02,\n  \"openingHours\": \"24/7\",\n  \"isIndoor\": false,\n  \"isCovered\": true,\n  \"hasAirConditioning\": false,\n  \"hasWifi\": true,\n  \"quietLevel\": 2\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Events & Opportunities",
+      "item": [
+        {
+          "name": "GET /api/events",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/events" }
+        },
+        {
+          "name": "GET /api/events?category=BURSARY",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/events?category=BURSARY" }
+        },
+        {
+          "name": "GET /api/events/{id}",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/events/{{eventId}}" }
+        },
+        {
+          "name": "POST /api/events (seed/admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/events",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman Test Event\",\n  \"description\": \"Created from Postman for API testing evidence\",\n  \"type\": \"WORKSHOP\",\n  \"organiser\": \"QA\",\n  \"startDateTime\": \"2026-11-01T10:00:00Z\",\n  \"isOutdoor\": false,\n  \"tags\": [\"test\"]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Favourites (Saved Items)",
+      "item": [
+        {
+          "name": "GET /api/favourites",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{idToken}}" }],
+            "url": "{{baseUrl}}/api/favourites"
+          }
+        },
+        {
+          "name": "POST /api/favourites (save a location)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{idToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/favourites",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemType\": \"LOCATION\",\n  \"itemId\": \"{{locationId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/favourites/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{idToken}}" }],
+            "url": "{{baseUrl}}/api/favourites/{{favouriteId}}"
+          }
+        },
+        {
+          "name": "POST /api/favourites/sync (offline batch replay)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{idToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/favourites/sync",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actions\": [\n    { \"action\": \"SAVE\", \"itemType\": \"LOCATION\", \"itemId\": \"{{locationId}}\", \"clientTimestamp\": 1730000000000 },\n    { \"action\": \"REMOVE\", \"itemType\": \"LOCATION\", \"itemId\": \"{{locationId}}\", \"clientTimestamp\": 1730000005000 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /api/favourites (no auth -> 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/favourites",
+            "body": { "mode": "raw", "raw": "{\n  \"itemType\": \"LOCATION\",\n  \"itemId\": \"anything\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Weather Recommendations",
+      "item": [
+        {
+          "name": "GET /api/recommendations/weather (live, if OPENWEATHER_API_KEY set)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/recommendations/weather" }
+        },
+        {
+          "name": "GET /api/recommendations/weather?mockCondition=RAIN",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/recommendations/weather?mockCondition=RAIN" }
+        },
+        {
+          "name": "GET /api/recommendations/weather?mockCondition=CLEAR",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/recommendations/weather?mockCondition=CLEAR" }
+        }
+      ]
+    }
+  ]
+}
