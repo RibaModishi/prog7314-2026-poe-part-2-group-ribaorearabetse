@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="red_primary">#DC2626</color>
+    <color name="red_primary_dark">#B91C1C</color>
+    <color name="red_accent">#EF4444</color>
+    <color name="red_surface_light">#FEF2F2</color>
+
+    <!-- Standard Neutrals -->
+    <color name="white">#FFFFFF</color>
+    <color name="background_light">#F9FAFB</color>
+    <color name="card_border">#E5E7EB</color>
+
+    <!-- Dark Glassmorphism Surfaces -->
+    <color name="dark_background">#0A0A0C</color>
+    <color name="glass_card_bg">#C8111318</color>
+    <color name="glass_card_stroke">#33FFFFFF</color>
+
+    <!-- Typography Text Tones -->
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_muted">#9CA3AF</color>
+
+    <!-- Text Colors -->
+    <color name="text_white_primary">#FFFFFF</color>
+    <color name="text_white_secondary">#9CA3AF</color>
+</resources>
