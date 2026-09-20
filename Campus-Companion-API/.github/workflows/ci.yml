@@ -10,9 +10,6 @@ jobs:
   backend-tests:
     name: Backend tests
     runs-on: ubuntu-latest
-    env:
-      JAVA_TOOL_OPTIONS: "-Dfile.encoding=UTF-8"
-      GRADLE_OPTS: "-Xmx1024m -Dfile.encoding=UTF-8"
 
     steps:
       - name: Checkout repository
@@ -37,9 +34,6 @@ jobs:
   android-tests:
     name: Android unit tests
     runs-on: ubuntu-latest
-    env:
-      JAVA_TOOL_OPTIONS: "-Dfile.encoding=UTF-8"
-      GRADLE_OPTS: "-Xmx1024m -Dfile.encoding=UTF-8"
 
     steps:
       - name: Checkout repository
