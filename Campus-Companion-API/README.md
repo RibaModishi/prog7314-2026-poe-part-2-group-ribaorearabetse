@@ -1,18 +1,46 @@
-# Campus Companion API
+# Campus Companion 🎓📱
 
-Custom Kotlin **Ktor** REST API + **Firebase Firestore** database for the *Campus
-Companion* Android app (PROG7314). This repo covers **Khumo-Thato Chabeli's part**
-of the project: Backend, Database, Authentication, and API — the Android app never
+Campus Companion is a multi-platform mobile and backend solution designed to streamline student life. It provides students with real-time campus navigation, event discovery, weather-aware recommendations, and personalized saved items through a Kotlin-based Android interface and a high-performance Ktor REST API backend.
+
+---
+
+## Table of Contents
+- [Project Overview](#-project-overview)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+- [Tech Stack](#-tech-stack)
+- [Backend & API Architecture](#-backend--api-architecture)
+- [Android Frontend Architecture](#-android-frontend-architecture)
+- [Offline Capability & Synchronization](#-offline-capability--synchronization)
+- [Automated Testing & CI/CD](#-automated-testing--cicd)
+- [Setup & Installation](#-setup--installation)
+- [Firebase & Environment Setup](#-firebase--environment-setup)
+- [Team Roles & Responsibilities](#-team-roles--responsibilities)
+- [Rubric & Submission Evidence](#-rubric--submission-evidence)
+
+---
+
+## 🚀 Project Overview
+
+Campus Companion bridges the gap between campus resources and students by providing a central digital hub. The system consists of:
+1. **Android Application**: Built with Kotlin and Jetpack Compose, offering an intuitive UI for navigation, weather updates, and event tracking.
+2. **Ktor REST API**: A lightweight backend built in Kotlin providing endpoints for user management, event data, and campus location endpoints. Android app never  [Ktor](https://ktor.io) 3.5.2 (Netty engine)
 talks to Firestore directly, it only talks to this API.
+3. **Database & Auth**: Firebase Firestore for real-time cloud persistence and Firebase Authentication for secure user sessions.
+4.  **Full endpoint reference:** [`docs/API_DOCUMENTATION.md`]
 
-- **Language/framework:** Kotlin, [Ktor](https://ktor.io) 3.5.2 (Netty engine)
-- **Database:** Firebase Firestore (NoSQL, cloud-hosted)
-- **Auth:** Firebase Authentication (email/password); every user-scoped request is
-  verified server-side via a Firebase ID token
-- **Full endpoint reference:** [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)
-- **Handover doc for the rest of the team:** [`docs/HANDOVER.md`](docs/HANDOVER.md) (Riba: business logic/testing, Khensani: Android/Retrofit integration kit)
+---
+##  Key Features
 
-## Architecture at a glance
+* ** Campus Navigator**: Smart map markers showing key locations, lecture halls, and facilities across campus.
+* ** Events & Opportunities**: Browse, search, and save upcoming campus events, academic deadlines, and social gatherings.
+* ** Weather-Aware Recommendations**: Integrates live weather data to give context-aware suggestions (e.g., indoor vs. outdoor activity recommendations).
+* ** Saved Items**: Allows students to bookmark key events and places for quick offline access.
+* ** Secure Authentication**: Firebase Auth integration supporting email/password sign-in and session security.
+
+---
+
+##  System Architecture
 
 ```
 Android App (Kotlin)
@@ -29,56 +57,116 @@ then sends the resulting ID token to this API on every request that needs to kno
 *who* is calling. This API is the **only** thing that reads/writes Firestore — the
 app never holds Firestore credentials.
 
-## Project layout
+---
 
-```
-src/main/kotlin/com/campuscompanion/api/
-├── Application.kt          - entry point (embeddedServer + plugin wiring)
-├── config/                 - env-driven config, Firebase Admin SDK init
-├── plugins/                - Ktor plugins: serialization, CORS, error handling, auth helper, routing
-├── models/                 - data classes (domain models + request DTOs)
-├── repositories/           - Firestore reads/writes, one per collection
-├── routes/                 - route handlers, grouped by feature area
-├── services/               - WeatherService (OpenWeather integration)
-└── data/                   - SeedData.kt, demo data for locations/events
-docs/API_DOCUMENTATION.md   - full endpoint reference
-postman/                    - Postman collection covering every endpoint
-```
+##  Tech Stack
 
-## Setup
+* **Mobile Frontend**: Kotlin, Jetpack Compose, Material Design 3, Retrofit, Coroutines & Flow.
+* **Backend API**: Kotlin, Ktor 3.5.2 (Netty engine), ContentNegotiation, Kotlinx Serialization.
+* **Database & Auth**: Firebase Firestore (NoSQL), Firebase Authentication (Email/Password), Firebase Admin SDK.
+* **External Services**: OpenWeather API (Live weather data).
+* **CI/CD Pipeline**: GitHub Actions (`.github/workflows/ci.yml`) targeting Android and Ktor modules.
 
-### 1. Prerequisites
+---
 
-- JDK 17+ (any recent JDK works; the wrapper pins Gradle 9.7.1 which supports JDK 17-26)
-- A Firebase project (this repo is configured for project ID `campus-companion-d4052`
-  — see [Firebase Console](https://console.firebase.google.com/))
+##  Backend & API Architecture
 
-### 2. Get Firebase credentials
+The Ktor API manages user data, event persistence, and location queries via JSON endpoints.
 
-1. Firebase Console → your project → ⚙️ **Project Settings** → **Service accounts**
-2. **Generate new private key** → downloads a JSON file
-3. Save it as `firebase-service-account.json` in the **project root** (same folder as
-   `build.gradle.kts`). This file is already git-ignored — **never commit it**.
-4. In the same Firebase project, enable:
-   - **Firestore Database** (production or test mode is fine for coursework)
-   - **Authentication → Sign-in method → Email/Password**
+### Key API Endpoints
 
-A placeholder showing the expected shape is at
-[`firebase-service-account.example.json`](firebase-service-account.example.json).
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/health` | Server health and Firebase connection diagnostics | No |
+| `GET` | `/api/events` | Retrieves all upcoming campus events | No |
+| `GET` | `/api/events/{id}` | Retrieves detailed information for a specific event | No |
+| `GET` | `/api/locations` | Fetches campus map coordinates and markers | No |
+| `POST` | `/api/saved` | Saves an event or location to the user's saved list | Yes (Bearer Token) |
+| `GET` | `/api/weather` | Proxies weather condition requests | No |
 
-### 3. Environment variables (all optional, sensible defaults provided)
+*Full endpoint specifications: [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)*  
+*Backend handover guidelines: [`docs/HANDOVER.md`](docs/HANDOVER.md)*
 
-| Variable                  | Default                          | Purpose |
-|----------------------------|-----------------------------------|---------|
-| `PORT`                    | `8090`                            | Server port |
-| `FIREBASE_CREDENTIALS_PATH`| `firebase-service-account.json`  | Path to the service-account JSON |
-| `FIREBASE_PROJECT_ID`     | `campus-companion-d4052`          | Firebase project ID (diagnostics/logging) |
-| `ALLOWED_CORS_ORIGINS`    | `*`                                | Comma-separated allowed origins, or `*` |
-| `AUTH_ENABLED`            | `true`                            | Set `false` **only** for local testing without real tokens (see below) |
-| `OPENWEATHER_API_KEY`     | *(unset → mock weather)*          | [OpenWeather](https://openweathermap.org/api) key for live weather recommendations |
-| `CAMPUS_LATITUDE` / `CAMPUS_LONGITUDE` | Durban coords | Coordinates used for the weather lookup |
+---
 
-## Running locally
+
+## 📁 Repository Structure
+
+├── .github/
+│   └── workflows/
+│       └── ci.yml                   # GitHub Actions CI pipeline
+├── Campus_Companion_PROG/           # Android App (Mobile Frontend Module)
+│   ├── app/
+│   │   └── src/
+│   │       ├── main/java/           # Kotlin source code & Jetpack Compose UI
+│   │       └── res/                 # UI resources & assets
+│   ├── build.gradle.kts
+│   └── gradlew
+├── src/main/kotlin/com/campuscompanion/api/  # Ktor Backend API Module
+│   ├── Application.kt               # Entry point (embeddedServer & plugin wiring)
+│   ├── config/                      # Environment-driven config & Firebase Admin setup
+│   ├── plugins/                     # Serialization, CORS, error handling, routing
+│   ├── models/                      # Domain models & request DTOs
+│   ├── repositories/                # Firestore reads/writes
+│   ├── routes/                      # Feature route handlers
+│   ├── services/                    # OpenWeather API integration
+│   └── data/                        # SeedData.kt for locations & events
+├── docs/                            # API documentation & handover notes
+├── postman/                         # Postman test collection
+├── build.gradle.kts                 # Root build script
+├── gradlew                          # Gradle wrapper
+└── README.md                        # Combined technical documentation
+
+---
+
+##  Offline Capability(POE) & Synchronization
+
+To ensure smooth operation during network loss:
+1. **Local Caching**: Critical UI details (saved events and cached location markers) are stored locally on the Android device.
+2. **Graceful Fallbacks**: Offline states trigger non-intrusive banner notifications while serving cached content.
+3. **Optimistic Updates**: Bookmarks and user selections update locally on the UI immediately and synchronize with the Ktor backend when connection is restored.
+
+---
+
+##  Automated Testing & CI/CD
+
+Continuous Integration is executed using **GitHub Actions** (`.github/workflows/ci.yml`).
+
+The workflow automatically executes on pushes and pull requests to `main`, `master`, and `develop`:
+* **Backend Tests Job**: Configures JDK 17, sets `GRADLE_OPTS`, compiles Ktor sources, and runs server-side unit tests (`./gradlew test`).
+* **Android Tests Job**: Configures JDK 17, sets up Android SDK (`cmdline-tools-version: 11076708`), compiles Android modules, executes unit tests (`./gradlew testDebugUnitTest`), and compiles the debug APK (`./gradlew assembleDebug`).
+
+---
+
+##  Setup & Prerequisites
+
+### Prerequisites
+- **JDK 17+** (The included Gradle wrapper pins Gradle 9.7.1, supporting JDK 17–26).
+- **Android Studio Ladybug** or newer.
+- **Firebase Project** (Configured for project ID `campus-companion-d4052`).
+
+### Firebase Credentials Setup
+1. Open [Firebase Console](https://console.firebase.google.com/) → **Project Settings** → **Service accounts**.
+2. Click **Generate new private key** to download your JSON credentials.
+3. Save the key as `firebase-service-account.json` in the project root directory (same folder as root `build.gradle.kts`). *Note: This file is git-ignored for security.*
+4. Enable **Firestore Database** and **Authentication** (Email/Password sign-in method) in Firebase Console.
+*(Refer to `firebase-service-account.example.json` for structure details).*
+
+### Environment Variables
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `PORT` | `8090` | Ktor HTTP server port |
+| `FIREBASE_CREDENTIALS_PATH` | `firebase-service-account.json` | Path to service-account JSON |
+| `FIREBASE_PROJECT_ID` | `campus-companion-d4052` | Firebase project ID |
+| `ALLOWED_CORS_ORIGINS` | `*` | Allowed CORS origins |
+| `AUTH_ENABLED` | `true` | Set `false` **only** for local debug testing without tokens |
+| `OPENWEATHER_API_KEY` | *(unset)* | OpenWeather API key for live context recommendations |
+
+---
+
+
+## Running locally & Backend Server
 
 ```bash
 # Windows
@@ -173,3 +261,11 @@ see the Planning & Design / Revised Task 1 Plan documents for the full breakdown
 | Khumo-Thato Chabeli | Kotlin Ktor backend, Firestore, Firebase Auth token validation, all REST endpoints, seed data, API docs & Postman evidence *(this repo)* |
 | Khensani Maluleke   | Android UI/UX, screens, navigation, design system, README/screenshots (Android app repo) |
 | Orearabetse Riba    | Domain models/DTOs, weather-recommendation business rules, validation rules, unit tests (Android app repo / shared logic) |
+
+---
+
+## Demo & Rubric Evidence 
+
+Demo Video: [link]
+APL Documentation: [`docs/API_DOCUMENTATION.md`]
+Postman Collection: 
