@@ -1,7 +1,6 @@
 name: Campus Companion CI
 
 on:
-  workflow_dispatch:
   push:
     branches: [ "main", "master", "develop" ]
   pull_request:
@@ -11,6 +10,8 @@ jobs:
   backend-tests:
     name: Backend tests
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: "-Xmx1024m -Dfile.encoding=UTF-8"
 
     steps:
       - name: Checkout repository
@@ -34,6 +35,8 @@ jobs:
   android-tests:
     name: Android unit tests
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: "-Xmx1024m -Dfile.encoding=UTF-8"
 
     steps:
       - name: Checkout repository
@@ -47,12 +50,13 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 11076708
+          packages: 'platform-tools platforms;android-37'
+          accept-android-sdk-licenses: true
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-
-      - name: Install Android SDK 37
-        run: sdkmanager "platforms;android-37"
 
       - name: Make Gradle wrapper executable
         working-directory: Campus_Companion_PROG
