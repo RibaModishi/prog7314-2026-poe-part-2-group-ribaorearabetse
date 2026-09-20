@@ -1,4 +1,4 @@
-# Campus Companion 🎓📱
+# Campus Companion 
 
 Campus Companion is a multi-platform mobile and backend solution designed to streamline student life. It provides students with real-time campus navigation, event discovery, weather-aware recommendations, and personalized saved items through a Kotlin-based Android interface and a high-performance Ktor REST API backend.
 
@@ -20,7 +20,7 @@ Campus Companion is a multi-platform mobile and backend solution designed to str
 
 ---
 
-## 🚀 Project Overview
+## Project Overview
 
 Campus Companion bridges the gap between campus resources and students by providing a central digital hub. The system consists of:
 1. **Android Application**: Built with Kotlin and Jetpack Compose, offering an intuitive UI for navigation, weather updates, and event tracking.
@@ -90,33 +90,34 @@ The Ktor API manages user data, event persistence, and location queries via JSON
 ---
 
 
-## 📁 Repository Structure
-
+## Repository Structure
+```
+.
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                   # GitHub Actions CI pipeline
-├── Campus_Companion_PROG/           # Android App (Mobile Frontend Module)
+│       └── ci.yml                             # GitHub Actions CI pipeline
+├── Campus_Companion_PROG/                     # Android App (Mobile Frontend Module)
 │   ├── app/
 │   │   └── src/
-│   │       ├── main/java/           # Kotlin source code & Jetpack Compose UI
-│   │       └── res/                 # UI resources & assets
+│   │       ├── main/java/                     # Kotlin source code & Jetpack Compose UI
+│   │       └── res/                           # UI resources & assets
 │   ├── build.gradle.kts
 │   └── gradlew
-├── src/main/kotlin/com/campuscompanion/api/  # Ktor Backend API Module
-│   ├── Application.kt               # Entry point (embeddedServer & plugin wiring)
-│   ├── config/                      # Environment-driven config & Firebase Admin setup
-│   ├── plugins/                     # Serialization, CORS, error handling, routing
-│   ├── models/                      # Domain models & request DTOs
-│   ├── repositories/                # Firestore reads/writes
-│   ├── routes/                      # Feature route handlers
-│   ├── services/                    # OpenWeather API integration
-│   └── data/                        # SeedData.kt for locations & events
-├── docs/                            # API documentation & handover notes
-├── postman/                         # Postman test collection
-├── build.gradle.kts                 # Root build script
-├── gradlew                          # Gradle wrapper
-└── README.md                        # Combined technical documentation
-
+├── src/main/kotlin/com/campuscompanion/api/    # Ktor Backend API Module
+│   ├── Application.kt                         # Entry point (embeddedServer & plugin wiring)
+│   ├── config/                                # Environment-driven config & Firebase Admin setup
+│   ├── plugins/                               # Serialization, CORS, error handling, routing
+│   ├── models/                                # Domain models & request DTOs
+│   ├── repositories/                          # Firestore reads/writes
+│   ├── routes/                                # Feature route handlers
+│   ├── services/                              # OpenWeather API integration
+│   └── data/                                  # SeedData.kt for locations & events
+├── docs/                                      # API documentation & handover notes
+├── postman/                                   # Postman test collection
+├── build.gradle.kts                           # Root build script
+├── gradlew                                    # Gradle wrapper
+└── README.md                                  # Combined technical documentation
+```
 ---
 
 ##  Offline Capability(POE) & Synchronization
@@ -266,6 +267,6 @@ see the Planning & Design / Revised Task 1 Plan documents for the full breakdown
 
 ## Demo & Rubric Evidence 
 
-Demo Video: [link]
-APL Documentation: [`docs/API_DOCUMENTATION.md`]
-Postman Collection: 
+- Demo Video: [link]
+- APL Documentation: [`docs/API_DOCUMENTATION.md`]
+- Postman Collection: 
