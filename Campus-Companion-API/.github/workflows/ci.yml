@@ -1,10 +1,11 @@
 name: Campus Companion CI
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "master", "develop" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "master", "develop" ]
 
 jobs:
   backend-tests:
