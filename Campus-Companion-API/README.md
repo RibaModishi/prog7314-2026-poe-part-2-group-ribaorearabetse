@@ -265,23 +265,22 @@ see the Planning & Design / Revised Task 1 Plan documents for the full breakdown
 
 ---
 
-## 📷 App Screenshots & UI Evidence
+##  App Screenshots & UI Evidence
 
 Below is a breakdown of the core user interface and features implemented in the Campus Companion Android application:
 
 | Feature / Screen | Preview | Description |
 | :--- | :---: | :--- |
-| **Authentication & Sign-In** | ![Sign In Screen] <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/fbd95462-e994-4504-af05-fdd4ff23a855" />
-| Secure student login and registration backed by Firebase Auth tokens. |
-| **Campus Navigator (Map)** | ![Campus Navigator Screen] <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/22385929-bded-42d0-96e7-f8bd192c3e8c" />
-
-| Interactive map view displaying campus landmarks, lecture halls, and facilities with custom markers. |
-| **Events & Opportunities** | ![Events Screen] <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/a8cc9186-123d-4d5b-a21a-6f43863d0103" />
-| List of upcoming campus events and academic deadlines with filtering by category. |
-| **Weather & Recommendations** | ![Weather View Screen](docs/screenshots/04_weather.png) | Live weather dashboard integration showing context-aware indoor/outdoor activity suggestions. |
-| **Saved Items (Bookmarks)** | ![Saved Items Screen](docs/screenshots/05_saved_items.png) | Personal bookmarking view with local offline caching support for quick access without network. |
-| **GitHub Actions CI/CD** | ![GitHub Actions Passing](docs/screenshots/06_ci_pipeline.png) | Automated build and test pipeline status showing green builds for Android and Backend jobs. |
-
+| **Authentication & Sign-In** | ![Sign In Screen]<img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/06b7f5ae-dcf5-4e78-a6cd-80ab1d1d7e22" />
+ | Secure student login and registration backed by Firebase Auth tokens. |
+| **User Profile** | <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/d55fa015-856d-4cf1-9e40-9ff0e952d450" />
+ | Displays student details, account information, and personal preferences. |
+| **Campus Navigator (Map)** | *(Paste image here)* | Interactive map view displaying campus landmarks, lecture halls, and facilities with custom markers. |
+| **Events & Opportunities** | *(Paste image here)* | List of upcoming campus events and academic deadlines with filtering by category. |
+| **Saved Items (Bookmarks)** | *(Paste image here)* | Personal bookmarking view with local offline caching support for quick access without network. |
+| **App Settings** | <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/dd72c00b-643c-434b-8e14-859d6915d1ce" />
+ | Application configuration options including language options, theme toggles, and notification settings. |
+| **GitHub Actions CI/CD** | *(Paste image here)* | Automated build and test pipeline status showing green builds for Android and Backend jobs. |
 ## Demo & Rubric Evidence 
 
 - Demo Video: [link]
