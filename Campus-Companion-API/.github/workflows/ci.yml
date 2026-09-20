@@ -1,0 +1,66 @@
+name: Campus Companion CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  backend-tests:
+    name: Backend tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Run backend tests
+        run: ./gradlew test
+
+  android-tests:
+    name: Android unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Android SDK 37
+        run: sdkmanager "platforms;android-37"
+
+      - name: Make Gradle wrapper executable
+        working-directory: Campus_Companion_PROG
+        run: chmod +x ./gradlew
+
+      - name: Run Android unit tests
+        working-directory: Campus_Companion_PROG
+        run: ./gradlew testDebugUnitTest
+
+      - name: Build debug APK
+        working-directory: Campus_Companion_PROG
+        run: ./gradlew assembleDebug
