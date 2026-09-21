@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.campus_companion_prog"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.campus_companion_prog"
