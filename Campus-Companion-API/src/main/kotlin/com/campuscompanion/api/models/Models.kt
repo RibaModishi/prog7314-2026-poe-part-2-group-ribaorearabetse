@@ -1,5 +1,6 @@
 package com.campuscompanion.api.models
 
+import com.campuscompanion.api.routes.LocationWeatherStatus
 import kotlinx.serialization.Serializable
 
 /** Allowed campus location categories (kept as plain strings in Firestore for flexibility). */
@@ -81,12 +82,25 @@ data class Favourite(
 )
 
 @Serializable
+data class LocationWeatherInfo(
+    val location: CampusLocation,
+    val status: LocationWeatherStatus
+)
+
+@Serializable
 data class WeatherRecommendation(
     val condition: String,
     val temperatureCelsius: Double? = null,
     val message: String,
     val recommendedLocationIds: List<String>,
-    val recommendedLocations: List<CampusLocation> = emptyList()
+    val recommendedLocations: List<CampusLocation> = emptyList(),
+    val allLocationsWithStatus: List<LocationWeatherInfo> = emptyList()
+)
+
+@Serializable
+data class EventWeatherWarning(
+    val eventId: String,
+    val warning: String?
 )
 
 @Serializable

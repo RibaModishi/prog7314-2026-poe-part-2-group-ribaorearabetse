@@ -27,6 +27,6 @@ fun Application.configureRouting() {
         locationRoutes(locationRepository)
         eventRoutes(eventRepository)
         favouriteRoutes(favouriteRepository, locationRepository, eventRepository)
-        recommendationRoutes(locationRepository, weatherService)
+        recommendationRoutes(locationRepository, weatherService, eventRepository)
     }
 }

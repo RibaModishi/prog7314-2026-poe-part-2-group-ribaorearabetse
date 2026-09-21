@@ -35,7 +35,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="16dp"
                 android:layout_toEndOf="@id/btnSettingsBack"
-                android:text="Settings"
+                android:text="@string/settings"
                 android:textColor="#111827"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="ACCOUNT"
+            android:text="@string/account"
             android:textColor="#6B7280"
             android:textSize="12sp"
             android:textStyle="bold" />
@@ -167,7 +167,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="PREFERENCES"
+            android:text="@string/preferences"
             android:textColor="#6B7280"
             android:textSize="12sp"
             android:textStyle="bold" />
@@ -188,8 +188,12 @@
                 android:orientation="vertical">
 
                 <RelativeLayout
+                    android:id="@+id/btnLanguage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:padding="16dp">
 
                     <ImageView
@@ -206,7 +210,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="12dp"
                         android:layout_toEndOf="@id/icLanguage"
-                        android:text="Language"
+                        android:text="@string/language"
                         android:textColor="#111827"
                         android:textSize="14sp" />
 
@@ -245,7 +249,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="12dp"
                         android:layout_toEndOf="@id/icPushNotif"
-                        android:text="Push Notifications"
+                        android:text="@string/push_notifications"
                         android:textColor="#111827"
                         android:textSize="14sp" />
 
@@ -284,7 +288,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="12dp"
                         android:layout_toEndOf="@id/icBiometric"
-                        android:text="Biometric Login"
+                        android:text="@string/biometric_login"
                         android:textColor="#111827"
                         android:textSize="14sp" />
 
@@ -420,7 +424,7 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_marginBottom="24dp"
-            android:text="Sign Out"
+            android:text="@string/sign_out"
             android:textColor="#DC2626"
             android:textSize="15sp"
             android:textStyle="bold"

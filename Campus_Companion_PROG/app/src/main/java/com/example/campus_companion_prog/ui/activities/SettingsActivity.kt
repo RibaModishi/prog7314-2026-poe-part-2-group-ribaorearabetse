@@ -1,22 +1,40 @@
 package com.example.campus_companion_prog.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import com.example.campus_companion_prog.R
+import com.example.campus_companion_prog.auth.BiometricHelper
+import com.example.campus_companion_prog.data.AuthRepository
+import com.example.campus_companion_prog.data.LocalPreferences
 import com.example.campus_companion_prog.databinding.ActivitySettingsBinding
+import kotlinx.coroutines.launch
 
-class SettingsActivity : AppCompatActivity() {
+/**
+ * Settings — profile from API, preferred language (API + local LocaleHelper),
+ * push/biometric toggles stored on-device.
+ */
+class SettingsActivity : LocalizedActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
+    private val authRepository = AuthRepository()
+    private lateinit var localPreferences: LocalPreferences
+
+    /** Avoid firing switch listeners while we hydrate UI from disk/API. */
+    private var suppressSwitchCallbacks = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         binding = ActivitySettingsBinding.inflate(layoutInflater)
+        localPreferences = LocalPreferences(this)
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
@@ -25,24 +43,170 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        // Back button
-        binding.btnSettingsBack.setOnClickListener {
-            finish()
-        }
+        binding.btnSettingsBack.setOnClickListener { finish() }
 
-        // Display Name & Photo click
         binding.btnDisplayNamePhoto.setOnClickListener {
-            Toast.makeText(this, "Display Name & Photo clicked", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "Display name comes from your profile. Photo upload lands in a later sprint.",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
-        // Clear Cache click
+        binding.btnLanguage.setOnClickListener { showLanguagePicker() }
+
+        suppressSwitchCallbacks = true
+        binding.switchPushNotifications.isChecked = localPreferences.pushNotificationsEnabled
+        binding.switchBiometric.isChecked = localPreferences.biometricEnabled
+        suppressSwitchCallbacks = false
+
+        binding.switchPushNotifications.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressSwitchCallbacks) return@setOnCheckedChangeListener
+            localPreferences.pushNotificationsEnabled = isChecked
+            Toast.makeText(
+                this,
+                if (isChecked) "Push notifications enabled (device preference)"
+                else "Push notifications disabled (device preference)",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        binding.switchBiometric.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressSwitchCallbacks) return@setOnCheckedChangeListener
+            if (isChecked) {
+                if (!BiometricHelper.canAuthenticate(this)) {
+                    suppressSwitchCallbacks = true
+                    binding.switchBiometric.isChecked = false
+                    suppressSwitchCallbacks = false
+                    Toast.makeText(this, "Biometrics not available on this device.", Toast.LENGTH_LONG).show()
+                    return@setOnCheckedChangeListener
+                }
+                BiometricHelper.prompt(
+                    activity = this,
+                    title = getString(R.string.biometric_login),
+                    subtitle = "Confirm to enable biometric unlock",
+                    onSuccess = {
+                        localPreferences.biometricEnabled = true
+                        Toast.makeText(this, "Biometric login preference saved", Toast.LENGTH_SHORT).show()
+                    },
+                    onError = { msg ->
+                        suppressSwitchCallbacks = true
+                        binding.switchBiometric.isChecked = false
+                        suppressSwitchCallbacks = false
+                        localPreferences.biometricEnabled = false
+                        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                    }
+                )
+            } else {
+                localPreferences.biometricEnabled = false
+                Toast.makeText(this, "Biometric login preference turned off", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         binding.btnClearCache.setOnClickListener {
-            Toast.makeText(this, "Cache cleared successfully", Toast.LENGTH_SHORT).show()
+            localPreferences.clearLocalCache()
+            suppressSwitchCallbacks = true
+            binding.switchPushNotifications.isChecked = true
+            binding.switchBiometric.isChecked = false
+            suppressSwitchCallbacks = false
+            Toast.makeText(this, "Local cache cleared", Toast.LENGTH_SHORT).show()
         }
 
-        // Sign Out button
-        binding.btnSignOut.setOnClickListener {
-            Toast.makeText(this, "Signing out...", Toast.LENGTH_SHORT).show()
+        binding.btnSignOut.setOnClickListener { signOut() }
+
+        loadProfile()
+    }
+
+    private fun loadProfile() {
+        lifecycleScope.launch {
+            authRepository.getProfile()
+                .onSuccess { profile ->
+                    Log.i(TAG, "Loaded settings profile name=${profile.name} lang=${profile.preferredLanguage}")
+                    binding.tvAccountName.text = profile.name
+                    binding.tvAccountEmail.text = profile.email
+                    binding.tvAccountInitials.text = initialsFor(profile.name)
+                    localPreferences.preferredLanguage = profile.preferredLanguage
+                    binding.tvSelectedLanguage.text = languageLabel(profile.preferredLanguage)
+                }
+                .onFailure { error ->
+                    Log.w(TAG, "Failed to load profile: ${error.message}")
+                    binding.tvSelectedLanguage.text = languageLabel(localPreferences.preferredLanguage)
+                    Toast.makeText(
+                        this@SettingsActivity,
+                        error.message ?: "Could not load profile",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
         }
+    }
+
+    private fun showLanguagePicker() {
+        val options = arrayOf("English", "isiZulu", "Afrikaans")
+        val codes = arrayOf("en", "zu", "af")
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.language))
+            .setItems(options) { _, which ->
+                saveLanguage(codes[which])
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun saveLanguage(code: String) {
+        lifecycleScope.launch {
+            // Persist locally first so UI locale applies even if API is slow/offline.
+            localPreferences.preferredLanguage = code
+            authRepository.updatePreferredLanguage(code)
+                .onSuccess { profile ->
+                    binding.tvSelectedLanguage.text = languageLabel(profile.preferredLanguage)
+                    Toast.makeText(
+                        this@SettingsActivity,
+                        getString(R.string.language_updated),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    recreate()
+                }
+                .onFailure { error ->
+                    // Still recreate so strings.xml locale takes effect offline.
+                    binding.tvSelectedLanguage.text = languageLabel(code)
+                    Toast.makeText(
+                        this@SettingsActivity,
+                        error.message ?: "Language saved on device only",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    recreate()
+                }
+        }
+    }
+
+    private fun signOut() {
+        authRepository.signOut()
+        Toast.makeText(this, getString(R.string.sign_out), Toast.LENGTH_SHORT).show()
+        startActivity(
+            Intent(this, LaunchActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        )
+        finish()
+    }
+
+    private fun languageLabel(code: String): String = when (code.lowercase()) {
+        "zu" -> "isiZulu ∨"
+        "af" -> "Afrikaans ∨"
+        else -> "English ∨"
+    }
+
+    private fun initialsFor(name: String): String {
+        val parts = name.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+        return when {
+            parts.size >= 2 -> "${parts[0].first().uppercaseChar()}${parts[1].first().uppercaseChar()}"
+            parts.size == 1 && parts[0].isNotEmpty() -> parts[0].take(2).uppercase()
+            else -> "?"
+        }
+    }
+
+    companion object {
+        private const val TAG = "SettingsActivity"
     }
 }

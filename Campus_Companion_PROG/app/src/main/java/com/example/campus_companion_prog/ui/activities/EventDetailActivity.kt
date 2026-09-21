@@ -1,14 +1,22 @@
 package com.example.campus_companion_prog.ui.activities
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.campus_companion_prog.api.EventOrOpportunity
+import com.example.campus_companion_prog.data.CampusRepository
+import com.example.campus_companion_prog.data.FavouriteOfflineRepository
 import com.example.campus_companion_prog.databinding.ActivityEventDetailBinding
+import kotlinx.coroutines.launch
 
-class EventDetailActivity : AppCompatActivity() {
+class EventDetailActivity : LocalizedActivity() {
 
     private lateinit var binding: ActivityEventDetailBinding
+    private val repository = CampusRepository()
+    private var currentEvent: EventOrOpportunity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,25 +25,93 @@ class EventDetailActivity : AppCompatActivity() {
 
         binding.btnBack.setOnClickListener { finish() }
 
-        // Example trigger: pass "Opportunity", "Social", or "School" via Intent
-        val categoryType = intent.getStringExtra("CATEGORY_TYPE") ?: "Opportunity"
-        configureActionButton(categoryType)
+        binding.btnBookmark.setOnClickListener {
+            val event = currentEvent ?: return@setOnClickListener
+            lifecycleScope.launch {
+                FavouriteOfflineRepository(this@EventDetailActivity)
+                    .saveFavourite("EVENT", event.id)
+                    .onSuccess {
+                        Toast.makeText(this@EventDetailActivity, "Saved to items", Toast.LENGTH_SHORT).show()
+                    }
+                    .onFailure { error ->
+                        Toast.makeText(
+                            this@EventDetailActivity,
+                            error.message ?: "Could not save",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+            }
+        }
+
+        val eventId = intent.getStringExtra(EXTRA_EVENT_ID)
+        if (eventId.isNullOrBlank()) {
+            Toast.makeText(this, "Missing event id", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+        loadEvent(eventId)
     }
 
-    fun configureActionButton(categoryType: String) {
-        when (categoryType.lowercase()) {
-            "opportunity", "bursary", "internship" -> {
+    private fun loadEvent(id: String) {
+        lifecycleScope.launch {
+            repository.getEvent(id)
+                .onSuccess { event ->
+                    Log.i(TAG, "Loaded event ${event.title}")
+                    currentEvent = event
+                    populateEventDetails(event)
+                    configureActionButton(event)
+                }
+                .onFailure { error ->
+                    Toast.makeText(
+                        this@EventDetailActivity,
+                        error.message ?: "Could not load event",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    finish()
+                }
+        }
+    }
+
+    private fun populateEventDetails(event: EventOrOpportunity) {
+        binding.tvTag.text = event.type.replace('_', ' ')
+        binding.tvTitle.text = event.title
+        binding.tvOrganisation.text = event.organiser
+        binding.tvDeadline.text = event.endDateTime?.take(10)
+            ?: event.startDateTime.take(10)
+        binding.tvValue.text = if (event.isOutdoor) "Outdoor" else "Indoor / online"
+        binding.tvEligibility.text = event.tags.joinToString(", ").ifBlank { "Open to all students" }
+        binding.tvAbout.text = event.description
+    }
+
+    private fun configureActionButton(event: EventOrOpportunity) {
+        when (event.type) {
+            "BURSARY", "INTERNSHIP" -> {
                 binding.btnApplyNow.text = "Apply Now"
                 binding.btnApplyNow.setOnClickListener {
-                    Toast.makeText(this, "Redirecting to application link...", Toast.LENGTH_SHORT).show()
+                    val url = event.externalUrl
+                    if (url.isNullOrBlank()) {
+                        Toast.makeText(this, "No application link available", Toast.LENGTH_SHORT).show()
+                    } else {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    }
                 }
             }
-            "social", "school", "event", "location" -> {
-                binding.btnApplyNow.text = "Get Directions"
+            else -> {
+                binding.btnApplyNow.text = "View details"
                 binding.btnApplyNow.setOnClickListener {
-                    Toast.makeText(this, "Opening map directions...", Toast.LENGTH_SHORT).show()
+                    val url = event.externalUrl
+                    if (!url.isNullOrBlank()) {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    } else {
+                        Toast.makeText(this, "Details shown above", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_EVENT_ID = "EVENT_ID"
+        private const val TAG = "EventDetailActivity"
     }
 }

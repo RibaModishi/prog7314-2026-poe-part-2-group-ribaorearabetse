@@ -1,13 +1,12 @@
 package com.example.campus_companion_prog.ui.activities
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.campus_companion_prog.databinding.ActivityDashboardBinding
 
-class DashboardActivity : AppCompatActivity() {
+class DashboardActivity : LocalizedActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
 

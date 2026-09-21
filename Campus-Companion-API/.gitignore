@@ -12,7 +12,13 @@ out/
 # Firebase / secrets - NEVER commit these
 firebase-service-account.json
 **/firebase-service-account.json
+**/google-services.json
 .env
+
+# Local machine config
+local.properties
+**/local.properties
+gradle/gradle-daemon-jvm.properties
 
 # OS
 .DS_Store

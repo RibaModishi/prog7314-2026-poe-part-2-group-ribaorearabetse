@@ -122,10 +122,14 @@ The Ktor API manages user data, event persistence, and location queries via JSON
 
 ##  Offline Capability(POE) & Synchronization
 
-To ensure smooth operation during network loss:
-1. **Local Caching**: Critical UI details (saved events and cached location markers) are stored locally on the Android device.
-2. **Graceful Fallbacks**: Offline states trigger non-intrusive banner notifications while serving cached content.
-3. **Optimistic Updates**: Bookmarks and user selections update locally on the UI immediately and synchronize with the Ktor backend when connection is restored.
+Favourites use an offline-first path in the Android app:
+
+1. **Room queue** (`PendingSyncActionEntity`) — when `POST /api/favourites` fails with a network error, the save/remove is written to a local Room table.
+2. **WorkManager** (`FavouriteSyncWorker`) — scheduled with `NetworkType.CONNECTED`; flushes the queue via `POST /api/favourites/sync`.
+3. **User feedback** — toast: “Saved offline — will sync when you reconnect.”
+4. **Graceful UX** — Saved / Navigate / Events still load from the API when online; offline writes do not block the UI.
+
+Code: `FavouriteOfflineRepository`, `AppDatabase`, `FavouriteSyncWorker`.
 
 ---
 
@@ -283,6 +287,23 @@ Below is a breakdown of the core user interface and features implemented in the 
 | **GitHub Actions CI/CD** | *(Paste image here)* | Automated build and test pipeline status showing green builds for Android and Backend jobs. |
 ## Demo & Rubric Evidence 
 
-- Demo Video: [link]
-- APL Documentation: [`docs/API_DOCUMENTATION.md`]
-- Postman Collection: 
+- **Demo video checklist (physical phone):** [`docs/DEMO_VIDEO_CHECKLIST.md`](docs/DEMO_VIDEO_CHECKLIST.md)
+- Demo Video (YouTube unlisted): *[paste link after recording]*
+- API Documentation: [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)
+- Postman Collection: [`postman/CampusCompanion.postman_collection.json`](postman/CampusCompanion.postman_collection.json)
+- Android integration kit: [`docs/android-integration/`](docs/android-integration/)
+- CI workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (backend `./gradlew test` + Android `testDebugUnitTest` / `assembleDebug`)
+
+### Rubric feature map (Android + API)
+
+| Rubric item | Evidence in repo |
+| :--- | :--- |
+| Auth / SSO | Firebase Email/Password Create Account + Sign In; optional biometric unlock |
+| Settings | Profile from `GET /api/users/me`; language `en`/`zu`/`af` (API + `LocaleHelper` + `values-zu`/`values-af`) |
+| REST round-trips | Locations, Events, Favourites, Weather via Retrofit → Ktor |
+| Offline sync | Room + WorkManager favourite queue |
+| Push notifications | FCM `CampusMessagingService` + local token store |
+| Biometrics | `BiometricHelper` + Settings toggle |
+| Unit tests | `WeatherRulesTest` (Android); backend tests under `src/test` |
+| CI/CD | GitHub Actions `ci.yml` |
+| Custom weather features | `WeatherRules` + Home / Navigate smart markers / Event outdoor banner |

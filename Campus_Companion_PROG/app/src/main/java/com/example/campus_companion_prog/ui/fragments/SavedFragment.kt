@@ -1,60 +1,157 @@
 package com.example.campus_companion_prog.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.campus_companion_prog.R
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.campus_companion_prog.data.CampusRepository
+import com.example.campus_companion_prog.data.SavedEventItem
+import com.example.campus_companion_prog.data.SavedLocationItem
+import com.example.campus_companion_prog.databinding.FragmentSavedBinding
+import com.example.campus_companion_prog.ui.activities.EventDetailActivity
+import com.example.campus_companion_prog.ui.activities.LocationDetailActivity
+import com.example.campus_companion_prog.ui.adapters.SavedEventAdapter
+import com.example.campus_companion_prog.ui.adapters.SavedLocationAdapter
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 /**
- * A simple [Fragment] subclass.
- * Use the [SavedFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * Saved Items — loads favourites from the API and resolves each to a full
+ * location or event for display (per handover: never talk to Firestore from the app).
  */
 class SavedFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private var _binding: FragmentSavedBinding? = null
+    private val binding get() = _binding!!
+
+    private val repository = CampusRepository()
+    private lateinit var locationAdapter: SavedLocationAdapter
+    private lateinit var eventAdapter: SavedEventAdapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSavedBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        locationAdapter = SavedLocationAdapter(
+            onOpen = { item ->
+                startActivity(
+                    Intent(requireContext(), LocationDetailActivity::class.java).apply {
+                        putExtra(LocationDetailActivity.EXTRA_LOCATION_ID, item.location.id)
+                    }
+                )
+            },
+            onRemove = { item -> removeFavourite(item.favourite.id, isLocation = true) }
+        )
+        eventAdapter = SavedEventAdapter(
+            onOpen = { item ->
+                startActivity(
+                    Intent(requireContext(), EventDetailActivity::class.java).apply {
+                        putExtra(EventDetailActivity.EXTRA_EVENT_ID, item.event.id)
+                    }
+                )
+            },
+            onRemove = { item -> removeFavourite(item.favourite.id, isLocation = false) }
+        )
+
+        binding.rvSavedLocations.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvSavedLocations.adapter = locationAdapter
+        binding.rvSavedOpportunities.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvSavedOpportunities.adapter = eventAdapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh whenever the tab becomes visible (e.g. after saving from details).
+        loadSavedItems()
+    }
+
+    private fun loadSavedItems() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val favouritesDeferred = async { repository.getFavourites() }
+            val locationsDeferred = async { repository.getLocations() }
+            val eventsDeferred = async { repository.getEvents() }
+
+            val favouritesResult = favouritesDeferred.await()
+            val locationsResult = locationsDeferred.await()
+            val eventsResult = eventsDeferred.await()
+
+            favouritesResult.onFailure { error ->
+                Log.e(TAG, "Favourites failed: ${error.message}")
+                Toast.makeText(
+                    requireContext(),
+                    error.message ?: "Could not load saved items (are you signed in?)",
+                    Toast.LENGTH_LONG
+                ).show()
+                return@launch
+            }
+
+            val favourites = favouritesResult.getOrThrow()
+            val locationsById = locationsResult.getOrDefault(emptyList()).associateBy { it.id }
+            val eventsById = eventsResult.getOrDefault(emptyList()).associateBy { it.id }
+
+            val savedLocations = favourites
+                .filter { it.itemType == "LOCATION" }
+                .mapNotNull { fav ->
+                    locationsById[fav.itemId]?.let { SavedLocationItem(fav, it) }
+                }
+
+            val savedEvents = favourites
+                .filter { it.itemType == "EVENT" }
+                .mapNotNull { fav ->
+                    eventsById[fav.itemId]?.let { SavedEventItem(fav, it) }
+                }
+
+            locationAdapter.submitList(savedLocations)
+            eventAdapter.submitList(savedEvents)
+            Log.i(TAG, "Saved locations=${savedLocations.size} events=${savedEvents.size}")
+
+            if (favourites.isEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    "No saved items yet — save from Navigate or Events.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_saved, container, false)
+    private fun removeFavourite(favouriteId: String, isLocation: Boolean) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repository.deleteFavourite(favouriteId)
+                .onSuccess {
+                    Toast.makeText(requireContext(), "Removed from saved", Toast.LENGTH_SHORT).show()
+                    loadSavedItems()
+                }
+                .onFailure { error ->
+                    Toast.makeText(
+                        requireContext(),
+                        error.message ?: "Could not remove",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SavedFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SavedFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        private const val TAG = "SavedFragment"
     }
 }

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Campus Companion</string>
+    <string name="settings">Instellings</string>
+    <string name="sign_out">Meld af</string>
+    <string name="language">Taal</string>
+    <string name="create_account">Skep rekening</string>
+    <string name="sign_in">Meld aan</string>
+    <string name="get_started">Begin</string>
+    <string name="already_have_account">Ek het reeds \'n rekening</string>
+    <string name="check_weather">Kontroleer weer vandag</string>
+    <string name="saved_items">Gestoorde items</string>
+    <string name="campus_navigator">Kampus-navigator</string>
+    <string name="events_opportunities">Gebeurtenisse &amp; geleenthede</string>
+    <string name="push_notifications">Stootkennisgewings</string>
+    <string name="biometric_login">Biometriese aanmelding</string>
+    <string name="account">REKENING</string>
+    <string name="preferences">VOORKEURE</string>
+    <string name="language_updated">Taal opgedateer</string>
+    <string name="offline_queued">Aflyn gestoor — sal sink wanneer jy weer verbind.</string>
+</resources>

@@ -4,16 +4,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.campus_companion_prog.R
+import com.example.campus_companion_prog.data.AuthRepository
 import com.example.campus_companion_prog.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : LocalizedActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -47,8 +47,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnLogout.setOnClickListener {
-            Toast.makeText(this, "Logging out...", Toast.LENGTH_SHORT).show()
-            finish()
+            logout()
         }
 
         // Handle specific actions for custom items in the side menu drawer
@@ -67,12 +66,16 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_help -> {
                     Toast.makeText(this, "Help & Feedback feature option selected", Toast.LENGTH_SHORT).show()
                 }
-                R.id.nav_logout -> {
-                    Toast.makeText(this, "Logging out...", Toast.LENGTH_SHORT).show()
-                    finish()
-                }
+                R.id.nav_logout -> logout()
             }
             true
         }
+    }
+
+    private fun logout() {
+        AuthRepository().signOut()
+        Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, LaunchActivity::class.java))
+        finish()
     }
 }

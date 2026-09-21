@@ -1,17 +1,37 @@
 package com.example.campus_companion_prog.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.campus_companion_prog.data.AuthRepository
+import com.example.campus_companion_prog.data.CampusRepository
 import com.example.campus_companion_prog.databinding.FragmentHomeBinding
+import com.example.campus_companion_prog.domain.WeatherRules
+import com.example.campus_companion_prog.ui.activities.EventDetailActivity
+import com.example.campus_companion_prog.ui.activities.LocationDetailActivity
+import com.example.campus_companion_prog.ui.adapters.EventAdapter
+import com.example.campus_companion_prog.ui.adapters.LocationAdapter
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    private val authRepository = AuthRepository()
+    private val campusRepository = CampusRepository()
+
+    private lateinit var spacesAdapter: LocationAdapter
+    private lateinit var opportunitiesAdapter: EventAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,24 +45,133 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set dynamic time-based greeting
         binding.tvGreeting.text = getDynamicGreeting()
+        binding.tvUserName.text =
+            authRepository.currentUser?.displayName?.takeIf { it.isNotBlank() } ?: "Student"
+        loadProfileName()
 
-        // Set up click actions for "See all" buttons
+        spacesAdapter = LocationAdapter { location ->
+            startActivity(
+                Intent(requireContext(), LocationDetailActivity::class.java).apply {
+                    putExtra(LocationDetailActivity.EXTRA_LOCATION_ID, location.id)
+                }
+            )
+        }
+        opportunitiesAdapter = EventAdapter { event ->
+            startActivity(
+                Intent(requireContext(), EventDetailActivity::class.java).apply {
+                    putExtra(EventDetailActivity.EXTRA_EVENT_ID, event.id)
+                }
+            )
+        }
+
+        binding.rvNearbySpaces.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvNearbySpaces.adapter = spacesAdapter
+        binding.rvOpportunities.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvOpportunities.isNestedScrollingEnabled = false
+        binding.rvOpportunities.adapter = opportunitiesAdapter
+
         binding.btnSeeAllSpaces.setOnClickListener {
-            // TODO: Navigate to full Spaces list
+            // Bottom nav Navigate is index 1 in typical setup — toast for now
+            Toast.makeText(requireContext(), "Open Navigate tab for all spaces", Toast.LENGTH_SHORT).show()
         }
-
         binding.btnSeeAllOpportunities.setOnClickListener {
-            // TODO: Navigate to full Opportunities list
+            Toast.makeText(requireContext(), "Open Events tab for all opportunities", Toast.LENGTH_SHORT).show()
         }
 
-        binding.btnCheckWeather.setOnClickListener {
-            android.widget.Toast.makeText(requireContext(), "Checking weather...", android.widget.Toast.LENGTH_SHORT).show()
-        }
+        binding.btnCheckWeather.setOnClickListener { showWeatherPicker() }
 
-        // Set up dynamic metrics (Pass values from your database/ViewModel here)
-        updateSummaryMetrics(openSpaces = 12, newEvents = 5, savedItems = 3)
+        loadDashboard(mockCondition = null)
+        refreshSavedCount()
+    }
+
+    private fun showWeatherPicker() {
+        val labels = arrayOf("Live / default", "Rain", "Hot", "Cold", "Wind", "Clear")
+        val codes = arrayOf(null, "RAIN", "HOT", "COLD", "WIND", "CLEAR")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Campus weather")
+            .setItems(labels) { _, which ->
+                loadDashboard(mockCondition = codes[which])
+            }
+            .show()
+    }
+
+    private fun loadDashboard(mockCondition: String?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            campusRepository.getWeatherRecommendation(mockCondition)
+                .onSuccess { weather ->
+                    Log.i(TAG, "Weather ${weather.condition} recommended=${weather.recommendedLocations.size}")
+                    val temp = weather.temperatureCelsius?.let { "${it.toInt()}°C" } ?: ""
+                    binding.tvWeatherCondition.text =
+                        "${WeatherRules.conditionDisplayName(weather.condition)} $temp".trim()
+                    binding.tvWeatherMessage.text = weather.message
+
+                    val statusById = weather.allLocationsWithStatus.associate {
+                        it.location.id to it.status
+                    }
+                    val recommended = weather.recommendedLocations.ifEmpty {
+                        weather.allLocationsWithStatus
+                            .filter { it.status == WeatherRules.STATUS_RECOMMENDED }
+                            .map { it.location }
+                    }
+
+                    spacesAdapter.submitList(
+                        recommended.take(8).map { loc ->
+                            LocationAdapter.Row(
+                                location = loc,
+                                weatherStatus = statusById[loc.id]
+                                    ?: WeatherRules.locationStatus(loc, weather.condition)
+                            )
+                        }
+                    )
+                    binding.tvOpenSpacesCount.text = recommended.size.toString()
+
+                    // Opportunities with weather indicators
+                    campusRepository.getEvents().onSuccess { events ->
+                        binding.tvNewEventsCount.text = events.size.toString()
+                        val opportunities = events.filter {
+                            it.type in setOf("BURSARY", "INTERNSHIP", "WORKSHOP", "CAMPUS_EVENT", "SOCIETY_ACTIVITY")
+                        }.take(5)
+                        opportunitiesAdapter.submitList(
+                            opportunities.map { event ->
+                                EventAdapter.Row(
+                                    event = event,
+                                    weatherIndicator = WeatherRules.eventWeatherIndicator(event, weather.condition)
+                                )
+                            }
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    Toast.makeText(
+                        requireContext(),
+                        error.message ?: "Could not load weather",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+        }
+    }
+
+    private fun refreshSavedCount() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            campusRepository.getFavourites()
+                .onSuccess { favs ->
+                    binding.tvSavedItemsCount.text = favs.size.toString()
+                }
+                .onFailure {
+                    // Not signed in or API down — leave placeholder
+                }
+        }
+    }
+
+    private fun loadProfileName() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            authRepository.getProfile()
+                .onSuccess { profile ->
+                    binding.tvUserName.text = profile.name
+                }
+        }
     }
 
     private fun getDynamicGreeting(): String {
@@ -55,14 +184,12 @@ class HomeFragment : Fragment() {
         }
     }
 
-    fun updateSummaryMetrics(openSpaces: Int, newEvents: Int, savedItems: Int) {
-        binding.tvOpenSpacesCount.text = openSpaces.toString()
-        binding.tvNewEventsCount.text = newEvents.toString()
-        binding.tvSavedItemsCount.text = savedItems.toString()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val TAG = "HomeFragment"
     }
 }

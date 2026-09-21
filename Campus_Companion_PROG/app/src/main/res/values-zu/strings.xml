@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Campus Companion</string>
+    <string name="settings">Izilungiselelo</string>
+    <string name="sign_out">Phuma</string>
+    <string name="language">Ulimi</string>
+    <string name="create_account">Dala i-akhawunti</string>
+    <string name="sign_in">Ngena</string>
+    <string name="get_started">Qala</string>
+    <string name="already_have_account">Sengivele ngine-akhawunti</string>
+    <string name="check_weather">Hlola isimo sezulu namuhla</string>
+    <string name="saved_items">Izinto ezilondoloziwe</string>
+    <string name="campus_navigator">Umtshina wekhampasi</string>
+    <string name="events_opportunities">Imicimbi namathuba</string>
+    <string name="push_notifications">Izaziso</string>
+    <string name="biometric_login">Ukungena nge-biometric</string>
+    <string name="account">I-AKHAWUNTI</string>
+    <string name="preferences">IZINTANDO</string>
+    <string name="language_updated">Ulimi lubuyekeziwe</string>
+    <string name="offline_queued">Kulondoloziwe offline — kuzovumelaniswa uma uphinda uxhume.</string>
+</resources>
