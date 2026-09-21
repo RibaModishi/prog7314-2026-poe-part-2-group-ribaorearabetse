@@ -14,6 +14,7 @@ import com.example.campus_companion_prog.auth.BiometricHelper
 import com.example.campus_companion_prog.data.AuthRepository
 import com.example.campus_companion_prog.data.LocalPreferences
 import com.example.campus_companion_prog.databinding.ActivitySettingsBinding
+import com.example.campus_companion_prog.i18n.LocaleHelper
 import kotlinx.coroutines.launch
 
 /**
@@ -48,7 +49,7 @@ class SettingsActivity : LocalizedActivity() {
         binding.btnDisplayNamePhoto.setOnClickListener {
             Toast.makeText(
                 this,
-                "Display name comes from your profile. Photo upload lands in a later sprint.",
+                getString(R.string.profile_photo_later),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -65,8 +66,8 @@ class SettingsActivity : LocalizedActivity() {
             localPreferences.pushNotificationsEnabled = isChecked
             Toast.makeText(
                 this,
-                if (isChecked) "Push notifications enabled (device preference)"
-                else "Push notifications disabled (device preference)",
+                if (isChecked) getString(R.string.push_enabled)
+                else getString(R.string.push_disabled),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -78,16 +79,16 @@ class SettingsActivity : LocalizedActivity() {
                     suppressSwitchCallbacks = true
                     binding.switchBiometric.isChecked = false
                     suppressSwitchCallbacks = false
-                    Toast.makeText(this, "Biometrics not available on this device.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.biometric_unavailable), Toast.LENGTH_LONG).show()
                     return@setOnCheckedChangeListener
                 }
                 BiometricHelper.prompt(
                     activity = this,
                     title = getString(R.string.biometric_login),
-                    subtitle = "Confirm to enable biometric unlock",
+                    subtitle = getString(R.string.confirm_biometric),
                     onSuccess = {
                         localPreferences.biometricEnabled = true
-                        Toast.makeText(this, "Biometric login preference saved", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.biometric_enabled), Toast.LENGTH_SHORT).show()
                     },
                     onError = { msg ->
                         suppressSwitchCallbacks = true
@@ -99,7 +100,7 @@ class SettingsActivity : LocalizedActivity() {
                 )
             } else {
                 localPreferences.biometricEnabled = false
-                Toast.makeText(this, "Biometric login preference turned off", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.biometric_disabled), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -109,7 +110,7 @@ class SettingsActivity : LocalizedActivity() {
             binding.switchPushNotifications.isChecked = true
             binding.switchBiometric.isChecked = false
             suppressSwitchCallbacks = false
-            Toast.makeText(this, "Local cache cleared", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.cache_cleared), Toast.LENGTH_SHORT).show()
         }
 
         binding.btnSignOut.setOnClickListener { signOut() }
@@ -141,21 +142,24 @@ class SettingsActivity : LocalizedActivity() {
     }
 
     private fun showLanguagePicker() {
-        val options = arrayOf("English", "isiZulu", "Afrikaans")
+        val options = arrayOf(
+            getString(R.string.lang_english),
+            getString(R.string.lang_zulu),
+            getString(R.string.lang_afrikaans)
+        )
         val codes = arrayOf("en", "zu", "af")
 
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.language))
+            .setTitle(getString(R.string.preferred_language))
             .setItems(options) { _, which ->
                 saveLanguage(codes[which])
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
     private fun saveLanguage(code: String) {
         lifecycleScope.launch {
-            // Persist locally first so UI locale applies even if API is slow/offline.
             localPreferences.preferredLanguage = code
             authRepository.updatePreferredLanguage(code)
                 .onSuccess { profile ->
@@ -165,17 +169,16 @@ class SettingsActivity : LocalizedActivity() {
                         getString(R.string.language_updated),
                         Toast.LENGTH_SHORT
                     ).show()
-                    recreate()
+                    LocaleHelper.applyAppLocale(code)
                 }
-                .onFailure { error ->
-                    // Still recreate so strings.xml locale takes effect offline.
+                .onFailure {
                     binding.tvSelectedLanguage.text = languageLabel(code)
                     Toast.makeText(
                         this@SettingsActivity,
-                        error.message ?: "Language saved on device only",
+                        getString(R.string.language_device_only),
                         Toast.LENGTH_LONG
                     ).show()
-                    recreate()
+                    LocaleHelper.applyAppLocale(code)
                 }
         }
     }

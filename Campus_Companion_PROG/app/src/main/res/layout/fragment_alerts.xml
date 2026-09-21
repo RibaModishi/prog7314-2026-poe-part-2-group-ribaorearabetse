@@ -10,7 +10,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Alerts"
+        android:text="@string/alerts"
         android:textColor="#111827"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -33,7 +33,7 @@
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mark all as read"
+        android:text="@string/mark_all_read"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.campus_companion_prog.R
 import com.example.campus_companion_prog.data.CampusRepository
 import com.example.campus_companion_prog.data.SavedEventItem
 import com.example.campus_companion_prog.data.SavedLocationItem
@@ -133,7 +134,7 @@ class SavedFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repository.deleteFavourite(favouriteId)
                 .onSuccess {
-                    Toast.makeText(requireContext(), "Removed from saved", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.removed_from_saved), Toast.LENGTH_SHORT).show()
                     loadSavedItems()
                 }
                 .onFailure { error ->

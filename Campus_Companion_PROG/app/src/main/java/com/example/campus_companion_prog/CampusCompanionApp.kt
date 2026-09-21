@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.os.Build
 import android.util.Log
 import com.example.campus_companion_prog.data.LocalPreferences
+import com.example.campus_companion_prog.i18n.LocaleHelper
 import com.example.campus_companion_prog.notifications.CampusMessagingService
 import com.google.firebase.messaging.FirebaseMessaging
 
@@ -14,6 +15,7 @@ class CampusCompanionApp : Application() {
     override fun onCreate() {
         super.onCreate()
         Log.i(TAG, "Application onCreate")
+        LocaleHelper.applyAppLocale(LocalPreferences(this).preferredLanguage)
         ensureNotificationChannel()
         refreshFcmToken()
     }
@@ -24,7 +26,7 @@ class CampusCompanionApp : Application() {
         manager.createNotificationChannel(
             NotificationChannel(
                 CampusMessagingService.CHANNEL_ID,
-                "Campus alerts",
+                getString(R.string.alerts),
                 NotificationManager.IMPORTANCE_DEFAULT
             )
         )

@@ -45,7 +45,7 @@ class LocationAdapter(
                     ?: GradientDrawable().apply { shape = GradientDrawable.OVAL }
                 DrawableCompat.setTint(drawable, color)
                 binding.viewWeatherMarker.background = drawable
-                binding.tvWeatherStatus.text = WeatherRules.markerLabel(status)
+                binding.tvWeatherStatus.text = WeatherRules.localizedMarkerLabel(binding.root.context, status)
                 binding.tvWeatherStatus.setTextColor(color)
             } else {
                 binding.tvWeatherStatus.text = ""

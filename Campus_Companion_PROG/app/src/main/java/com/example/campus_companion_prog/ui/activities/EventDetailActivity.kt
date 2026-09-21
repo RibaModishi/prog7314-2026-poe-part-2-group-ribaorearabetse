@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import com.example.campus_companion_prog.R
 import com.example.campus_companion_prog.api.EventOrOpportunity
 import com.example.campus_companion_prog.data.CampusRepository
 import com.example.campus_companion_prog.data.FavouriteOfflineRepository
@@ -31,7 +32,7 @@ class EventDetailActivity : LocalizedActivity() {
                 FavouriteOfflineRepository(this@EventDetailActivity)
                     .saveFavourite("EVENT", event.id)
                     .onSuccess {
-                        Toast.makeText(this@EventDetailActivity, "Saved to items", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@EventDetailActivity, getString(R.string.saved_to_items), Toast.LENGTH_SHORT).show()
                     }
                     .onFailure { error ->
                         Toast.makeText(
@@ -86,7 +87,7 @@ class EventDetailActivity : LocalizedActivity() {
     private fun configureActionButton(event: EventOrOpportunity) {
         when (event.type) {
             "BURSARY", "INTERNSHIP" -> {
-                binding.btnApplyNow.text = "Apply Now"
+                binding.btnApplyNow.text = getString(R.string.apply_now)
                 binding.btnApplyNow.setOnClickListener {
                     val url = event.externalUrl
                     if (url.isNullOrBlank()) {
@@ -97,7 +98,7 @@ class EventDetailActivity : LocalizedActivity() {
                 }
             }
             else -> {
-                binding.btnApplyNow.text = "View details"
+                binding.btnApplyNow.text = getString(R.string.view_details)
                 binding.btnApplyNow.setOnClickListener {
                     val url = event.externalUrl
                     if (!url.isNullOrBlank()) {

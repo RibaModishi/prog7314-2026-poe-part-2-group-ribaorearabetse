@@ -77,9 +77,17 @@ class EventsFragment : Fragment() {
                 ?.associate { it.eventId to it.warning }
                 ?: emptyMap()
 
-            // Fill gaps with local Riba rules
+            // Fill gaps with local Riba rules (resource ids → localized text)
             if (warningById.isEmpty()) {
-                warningById = allEvents.associate { it.id to WeatherRules.eventWeatherIndicator(it, weatherCondition) }
+                warningById = allEvents.associate { event ->
+                    event.id to WeatherRules.localizedEventBanner(requireContext(), event, weatherCondition)
+                }
+            } else {
+                warningById = allEvents.associate { event ->
+                    val apiWarning = warningById[event.id]
+                    event.id to (apiWarning
+                        ?: WeatherRules.localizedEventBanner(requireContext(), event, weatherCondition))
+                }
             }
 
             applyFilters()
@@ -134,7 +142,7 @@ class EventsFragment : Fragment() {
                 EventAdapter.Row(
                     event = event,
                     weatherIndicator = warningById[event.id]
-                        ?: WeatherRules.eventWeatherIndicator(event, weatherCondition)
+                        ?: WeatherRules.localizedEventBanner(requireContext(), event, weatherCondition)
                 )
             }
         )

@@ -53,7 +53,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create Account"
+                android:text="@string/create_account"
                 android:textColor="#FFFFFF"
                 android:textSize="32sp"
                 android:textStyle="bold" />
@@ -62,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Tell us who you are to get started."
+                android:text="@string/create_account_subtitle"
                 android:textColor="@color/text_white_secondary"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -81,7 +81,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Full name"
+                android:text="@string/full_name"
                 android:textColor="#1F2937"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -113,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Student Email"
+                android:text="@string/student_email"
                 android:textColor="#1F2937"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -145,7 +145,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Password"
+                android:text="@string/password"
                 android:textColor="#1F2937"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -179,7 +179,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:layout_marginTop="20dp"
-                android:text="Create Account"
+                android:text="@string/create_account"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -193,7 +193,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center"
                 android:padding="8dp"
-                android:text="Already registered? Sign In"
+                android:text="@string/already_registered_sign_in"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 android:textStyle="bold" />

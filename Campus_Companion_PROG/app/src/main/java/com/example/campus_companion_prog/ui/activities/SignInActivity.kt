@@ -73,7 +73,7 @@ class SignInActivity : LocalizedActivity() {
                 Log.i(TAG, "Sign-in success profile=${profile.uid}")
                 Toast.makeText(
                     this@SignInActivity,
-                    "Welcome back, ${profile.name}",
+                    getString(R.string.welcome_back, profile.name),
                     Toast.LENGTH_SHORT
                 ).show()
                 startActivity(Intent(this@SignInActivity, MainActivity::class.java))
@@ -91,7 +91,7 @@ class SignInActivity : LocalizedActivity() {
 
     private fun setLoading(loading: Boolean) {
         binding.btnMicrosoftSso.isEnabled = !loading
-        binding.btnMicrosoftSso.text = if (loading) "Signing in…" else getString(R.string.sign_in)
+        binding.btnMicrosoftSso.text = if (loading) getString(R.string.signing_in) else getString(R.string.sign_in)
         binding.etStudentEmail.isEnabled = !loading
         binding.etPassword.isEnabled = !loading
         val biometricReady = localPreferences.biometricEnabled &&

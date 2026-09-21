@@ -53,7 +53,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sign In"
+                android:text="@string/sign_in"
                 android:textColor="#FFFFFF"
                 android:textSize="32sp"
                 android:textStyle="bold" />
@@ -62,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Welcome back — use your campus account."
+                android:text="@string/sign_in_subtitle"
                 android:textColor="@color/text_white_secondary"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -81,7 +81,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Student Email"
+                android:text="@string/student_email"
                 android:textColor="#1F2937"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -113,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Password"
+                android:text="@string/password"
                 android:textColor="#1F2937"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -147,7 +147,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:layout_marginTop="20dp"
-                android:text="Sign In"
+                android:text="@string/sign_in"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -159,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginVertical="16dp"
-                android:text="or"
+                android:text="@string/or"
                 android:textColor="#9CA3AF"
                 android:textSize="12sp" />
 
@@ -168,7 +168,7 @@
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
-                android:text="👋   Use Biometric Login"
+                android:text="@string/biometric_login"
                 android:textColor="#1F2937"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -181,7 +181,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:text="New here? Go back and tap Get Started to create an account."
+                android:text="@string/new_here_hint"
                 android:textColor="#9CA3AF"
                 android:textSize="11sp" />
 

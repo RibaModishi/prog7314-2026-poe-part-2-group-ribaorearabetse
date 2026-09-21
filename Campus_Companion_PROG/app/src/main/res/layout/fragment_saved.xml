@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="&quot;What can I do, and where can I go?&quot;"
+            android:text="@string/saved_subtitle"
             android:textColor="#6B7280"
             android:textSize="13sp" />
 
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="12dp"
-            android:text="📍 Saved Locations"
+            android:text="@string/saved_locations"
             android:textColor="#374151"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="12dp"
-            android:text="📌 Saved Opportunities"
+            android:text="@string/saved_events"
             android:textColor="#374151"
             android:textSize="15sp"
             android:textStyle="bold" />

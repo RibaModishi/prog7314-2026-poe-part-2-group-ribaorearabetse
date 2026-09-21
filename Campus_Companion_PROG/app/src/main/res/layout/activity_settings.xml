@@ -146,7 +146,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="12dp"
                         android:layout_toEndOf="@id/icDisplayPhoto"
-                        android:text="Display Name &amp; Photo"
+                        android:text="@string/display_name_photo"
                         android:textColor="#111827"
                         android:textSize="14sp" />
 
@@ -310,7 +310,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="DATA &amp; STORAGE"
+            android:text="@string/data_storage"
             android:textColor="#6B7280"
             android:textSize="12sp"
             android:textStyle="bold" />
@@ -351,7 +351,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="12dp"
                         android:layout_toEndOf="@id/icCache"
-                        android:text="Clear Cached Data"
+                        android:text="@string/clear_cached_data"
                         android:textColor="#111827"
                         android:textSize="14sp" />
 
@@ -394,14 +394,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Offline Mode"
+                            android:text="@string/offline_mode"
                             android:textColor="#111827"
                             android:textSize="14sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Syncs automatically on reconnect"
+                            android:text="@string/offline_mode_hint"
                             android:textColor="#9CA3AF"
                             android:textSize="11sp" />
                     </LinearLayout>

@@ -45,7 +45,7 @@
             android:layout_marginTop="12dp"
             android:gravity="center"
             android:paddingHorizontal="16dp"
-            android:text="Discover spaces, opportunities, and events — all in one place built for students."
+            android:text="@string/launch_tagline"
             android:textColor="@color/text_white_secondary"
             android:textSize="13sp" />
     </LinearLayout>
@@ -85,7 +85,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Campus Navigator"
+                    android:text="@string/campus_navigator"
                     android:textColor="#1F2937"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -93,7 +93,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Find study spaces &amp; chill spots"
+                    android:text="@string/launch_nav_desc"
                     android:textColor="#6B7280"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -125,7 +125,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Events &amp; Opportunities"
+                    android:text="@string/events_opportunities"
                     android:textColor="#1F2937"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -133,7 +133,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Social, school &amp; career opportunities"
+                    android:text="@string/launch_events_desc"
                     android:textColor="#6B7280"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -164,7 +164,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Saved &amp; Notifications"
+                    android:text="@string/launch_saved_title"
                     android:textColor="#1F2937"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -172,7 +172,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Save listings, stay in the loop"
+                    android:text="@string/launch_saved_desc"
                     android:textColor="#6B7280"
                     android:textSize="12sp" />
             </LinearLayout>

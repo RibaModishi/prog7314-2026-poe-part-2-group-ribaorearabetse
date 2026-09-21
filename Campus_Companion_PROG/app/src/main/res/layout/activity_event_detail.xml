@@ -114,7 +114,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Organisation"
+                            android:text="@string/organisation"
                             android:textColor="#9CA3AF"
                             android:textSize="11sp" />
 
@@ -150,7 +150,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Date / Deadline"
+                            android:text="@string/date_deadline"
                             android:textColor="#9CA3AF"
                             android:textSize="11sp" />
 
@@ -194,7 +194,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Value"
+                            android:text="@string/value"
                             android:textColor="#9CA3AF"
                             android:textSize="11sp" />
 
@@ -230,7 +230,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Eligibility"
+                            android:text="@string/eligibility"
                             android:textColor="#9CA3AF"
                             android:textSize="11sp" />
 
@@ -261,7 +261,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="About"
+                    android:text="@string/about"
                     android:textColor="#111827"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -296,7 +296,7 @@
             android:layout_width="0dp"
             android:layout_height="54dp"
             android:layout_weight="1"
-            android:text="Apply Now"
+            android:text="@string/apply_now"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
             android:textStyle="bold"

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import com.example.campus_companion_prog.R
 import com.example.campus_companion_prog.api.CampusLocation
 import com.example.campus_companion_prog.data.CampusRepository
 import com.example.campus_companion_prog.data.FavouriteOfflineRepository
@@ -43,7 +44,7 @@ class LocationDetailActivity : LocalizedActivity() {
                 FavouriteOfflineRepository(this@LocationDetailActivity)
                     .saveFavourite("LOCATION", loc.id)
                     .onSuccess {
-                        Toast.makeText(this@LocationDetailActivity, "Saved to items", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LocationDetailActivity, getString(R.string.saved_to_items), Toast.LENGTH_SHORT).show()
                     }
                     .onFailure { error ->
                         Toast.makeText(

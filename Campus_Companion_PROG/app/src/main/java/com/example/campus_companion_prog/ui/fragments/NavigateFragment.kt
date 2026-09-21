@@ -11,6 +11,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.campus_companion_prog.R
 import com.example.campus_companion_prog.api.CampusLocation
 import com.example.campus_companion_prog.data.CampusRepository
 import com.example.campus_companion_prog.databinding.FragmentNavigateBinding
@@ -79,7 +80,7 @@ class NavigateFragment : Fragment() {
                     statusById = allLocations.associate { it.id to WeatherRules.locationStatus(it, weather.condition) }
                 }
                 binding.tvMapPlaceholder.text =
-                    "Smart markers • ${WeatherRules.conditionDisplayName(weather.condition)}"
+                    "${getString(R.string.smart_markers)} • ${WeatherRules.localizedCondition(requireContext(), weather.condition)}"
                 Log.i(TAG, "Weather=${weather.condition} markers=${statusById.size}")
             }.onFailure {
                 statusById = allLocations.associate { it.id to WeatherRules.locationStatus(it, weatherCondition) }

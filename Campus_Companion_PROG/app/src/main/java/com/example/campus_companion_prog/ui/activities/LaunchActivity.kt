@@ -28,7 +28,7 @@ class LaunchActivity : LocalizedActivity() {
                 BiometricHelper.prompt(
                     activity = this,
                     title = getString(R.string.biometric_login),
-                    subtitle = "Unlock Campus Companion",
+                    subtitle = getString(R.string.unlock_campus),
                     onSuccess = { goMain() },
                     onError = { msg ->
                         Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
