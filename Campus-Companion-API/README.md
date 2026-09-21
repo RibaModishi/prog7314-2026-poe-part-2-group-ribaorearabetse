@@ -284,7 +284,7 @@ Below is a breakdown of the core user interface and features implemented in the 
 | **Saved Items (Bookmarks)** | *(Paste image here)* | Personal bookmarking view with local offline caching support for quick access without network. |
 | **App Settings** | <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/dd72c00b-643c-434b-8e14-859d6915d1ce" />
  | Application configuration options including language options, theme toggles, and notification settings. |
-| **GitHub Actions CI/CD** | *(Paste image here)* | Automated build and test pipeline status showing green builds for Android and Backend jobs. |
+| **GitHub Actions CI/CD** | <img width="1080" alt="Green Campus Companion CI run" src="docs/screenshots/ci-green.png" /> | Automated build and test pipeline — Backend tests + Android unit tests/APK both green ([run #13](https://github.com/KChabeli/campus-companion-api/actions/runs/35665939256)). |
 ## Demo & Rubric Evidence 
 
 - **Demo video checklist (physical phone):** [`docs/DEMO_VIDEO_CHECKLIST.md`](docs/DEMO_VIDEO_CHECKLIST.md)
