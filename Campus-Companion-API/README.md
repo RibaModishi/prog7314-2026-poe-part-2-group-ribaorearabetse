@@ -279,7 +279,7 @@ Below is a breakdown of the core user interface and features implemented in the 
  | Secure student login and registration backed by Firebase Auth tokens. |
 | **User Profile** | <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/d55fa015-856d-4cf1-9e40-9ff0e952d450" />
  | Displays student details, account information, and personal preferences. |
-| **Campus Navigator (Map)** | *(Paste image here)* | Interactive map view displaying campus landmarks, lecture halls, and facilities with custom markers. |
+| **Campus Navigator (Map)** | <img width="360" alt="Campus Navigator with smart weather markers" src="docs/screenshots/campus-navigator.png" /> | Interactive campus locations with weather-aware smart markers (recommended / indoor / outdoor / less suitable). |
 | **Events & Opportunities** | *(Paste image here)* | List of upcoming campus events and academic deadlines with filtering by category. |
 | **Saved Items (Bookmarks)** | *(Paste image here)* | Personal bookmarking view with local offline caching support for quick access without network. |
 | **App Settings** | <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/dd72c00b-643c-434b-8e14-859d6915d1ce" />

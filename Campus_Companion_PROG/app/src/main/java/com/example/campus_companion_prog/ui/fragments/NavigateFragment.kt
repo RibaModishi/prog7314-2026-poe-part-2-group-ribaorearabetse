@@ -79,8 +79,7 @@ class NavigateFragment : Fragment() {
                     statusById = allLocations.associate { it.id to WeatherRules.locationStatus(it, weather.condition) }
                 }
                 binding.tvMapPlaceholder.text =
-                    "Smart markers • ${WeatherRules.conditionDisplayName(weather.condition)}" +
-                        "\n🟢 Recommended  🔵 Indoor\n🟠 Outdoor  ⚪ Less suitable"
+                    "Smart markers • ${WeatherRules.conditionDisplayName(weather.condition)}"
                 Log.i(TAG, "Weather=${weather.condition} markers=${statusById.size}")
             }.onFailure {
                 statusById = allLocations.associate { it.id to WeatherRules.locationStatus(it, weatherCondition) }
