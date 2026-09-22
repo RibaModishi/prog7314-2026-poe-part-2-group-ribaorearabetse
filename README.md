@@ -43,7 +43,7 @@ The project consists of an Android client and a Kotlin/Ktor REST API. Firebase A
 
 ## Additional evidence is available
 
-Video Demo: []
+Video Demo: [https://youtu.be/P7ZJTaKgDWU]
 
 API Documentation: [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)
 
