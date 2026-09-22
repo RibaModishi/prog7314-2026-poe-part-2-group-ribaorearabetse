@@ -72,6 +72,10 @@ class MainActivity : LocalizedActivity() {
         }
     }
 
+    fun navigateToTab(destinationId: Int) {
+        binding.bottomNavigation.selectedItemId = destinationId
+    }
+
     private fun logout() {
         AuthRepository().signOut()
         Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()

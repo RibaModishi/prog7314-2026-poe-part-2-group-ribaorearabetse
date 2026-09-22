@@ -11,12 +11,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.campus_companion_prog.R
 import com.example.campus_companion_prog.data.AuthRepository
 import com.example.campus_companion_prog.data.CampusRepository
 import com.example.campus_companion_prog.databinding.FragmentHomeBinding
 import com.example.campus_companion_prog.domain.WeatherRules
 import com.example.campus_companion_prog.ui.activities.EventDetailActivity
 import com.example.campus_companion_prog.ui.activities.LocationDetailActivity
+import com.example.campus_companion_prog.ui.activities.MainActivity
 import com.example.campus_companion_prog.ui.adapters.EventAdapter
 import com.example.campus_companion_prog.ui.adapters.LocationAdapter
 import kotlinx.coroutines.launch
@@ -73,11 +75,10 @@ class HomeFragment : Fragment() {
         binding.rvOpportunities.adapter = opportunitiesAdapter
 
         binding.btnSeeAllSpaces.setOnClickListener {
-            // Bottom nav Navigate is index 1 in typical setup — toast for now
-            Toast.makeText(requireContext(), "Open Navigate tab for all spaces", Toast.LENGTH_SHORT).show()
+            (activity as? MainActivity)?.navigateToTab(R.id.nav_navigate)
         }
         binding.btnSeeAllOpportunities.setOnClickListener {
-            Toast.makeText(requireContext(), "Open Events tab for all opportunities", Toast.LENGTH_SHORT).show()
+            (activity as? MainActivity)?.navigateToTab(R.id.nav_events)
         }
 
         binding.btnCheckWeather.setOnClickListener { showWeatherPicker() }
