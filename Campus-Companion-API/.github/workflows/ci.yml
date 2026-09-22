@@ -1,0 +1,66 @@
+name: Campus Companion CI
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+  workflow_dispatch:
+
+jobs:
+  backend-tests:
+    name: Backend tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Run backend tests
+        run: ./gradlew test --no-daemon
+
+  android-tests:
+    name: Android unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          # API 37 package is not always published on CI sdkmanager yet
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
+          accept-android-sdk-licenses: true
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run Android unit tests
+        working-directory: Campus_Companion_PROG
+        run: |
+          chmod +x ./gradlew
+          ./gradlew testDebugUnitTest --no-daemon
+
+      - name: Build debug APK
+        working-directory: Campus_Companion_PROG
+        run: ./gradlew assembleDebug --no-daemon
