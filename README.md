@@ -294,7 +294,7 @@ Mount `firebase-service-account.json` via Secret Manager; do not bake it into th
 ## Demo & Rubric Evidence
 
 - **Demo video checklist:** [`docs/DEMO_VIDEO_CHECKLIST.md`](docs/DEMO_VIDEO_CHECKLIST.md)
-- Demo Video (YouTube unlisted): *[paste link after recording]*
+- Demo Video (YouTube unlisted): https://youtu.be/P7ZJTaKgDWU
 - API Documentation: [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)
 - Postman Collection: [`postman/CampusCompanion.postman_collection.json`](postman/CampusCompanion.postman_collection.json)
 - Android integration kit: [`docs/android-integration/`](docs/android-integration/)
