@@ -25,7 +25,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/bg_white_card" />
+                    android:src="@drawable/bg_detail_hero_location" />
 
                 <!-- Dark Gradient Overlay for Readability -->
                 <View
@@ -116,7 +116,7 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@drawable/ic_calendar_today"
+                            android:src="@drawable/ic_events_vector"
                             app:tint="#6B7280" />
 
                         <TextView
@@ -160,7 +160,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="@string/capacity"
+                            android:text="@string/quiet_level"
                             android:textColor="#9CA3AF"
                             android:textSize="11sp" />
 
@@ -197,7 +197,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="@string/status"
+                            android:text="@string/format"
                             android:textColor="#9CA3AF"
                             android:textSize="11sp" />
 
@@ -306,7 +306,9 @@
             android:layout_marginStart="12dp"
             android:background="@drawable/bg_search_input"
             android:contentDescription="Save Space"
-            android:src="@drawable/ic_saved_items"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_bookmark_vector"
             app:tint="@color/red_primary" />
     </LinearLayout>
 

@@ -37,7 +37,7 @@ class EventDetailActivity : LocalizedActivity() {
                     .onFailure { error ->
                         Toast.makeText(
                             this@EventDetailActivity,
-                            error.message ?: "Could not save",
+                            error.message ?: getString(R.string.could_not_save),
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -46,7 +46,7 @@ class EventDetailActivity : LocalizedActivity() {
 
         val eventId = intent.getStringExtra(EXTRA_EVENT_ID)
         if (eventId.isNullOrBlank()) {
-            Toast.makeText(this, "Missing event id", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.could_not_load), Toast.LENGTH_LONG).show()
             finish()
             return
         }
@@ -65,7 +65,7 @@ class EventDetailActivity : LocalizedActivity() {
                 .onFailure { error ->
                     Toast.makeText(
                         this@EventDetailActivity,
-                        error.message ?: "Could not load event",
+                        error.message ?: getString(R.string.could_not_load),
                         Toast.LENGTH_LONG
                     ).show()
                     finish()
@@ -79,8 +79,14 @@ class EventDetailActivity : LocalizedActivity() {
         binding.tvOrganisation.text = event.organiser
         binding.tvDeadline.text = event.endDateTime?.take(10)
             ?: event.startDateTime.take(10)
-        binding.tvValue.text = if (event.isOutdoor) "Outdoor" else "Indoor / online"
-        binding.tvEligibility.text = event.tags.joinToString(", ").ifBlank { "Open to all students" }
+        // "Format" card — indoor vs outdoor (not financial value)
+        binding.tvValue.text = if (event.isOutdoor) {
+            getString(R.string.marker_outdoor)
+        } else {
+            getString(R.string.indoor_online)
+        }
+        binding.tvEligibility.text = event.tags.joinToString(", ")
+            .ifBlank { getString(R.string.open_to_all) }
         binding.tvAbout.text = event.description
     }
 
@@ -91,7 +97,7 @@ class EventDetailActivity : LocalizedActivity() {
                 binding.btnApplyNow.setOnClickListener {
                     val url = event.externalUrl
                     if (url.isNullOrBlank()) {
-                        Toast.makeText(this, "No application link available", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.could_not_load), Toast.LENGTH_SHORT).show()
                     } else {
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                     }
@@ -104,7 +110,7 @@ class EventDetailActivity : LocalizedActivity() {
                     if (!url.isNullOrBlank()) {
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                     } else {
-                        Toast.makeText(this, "Details shown above", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, event.description, Toast.LENGTH_SHORT).show()
                     }
                 }
             }

@@ -121,5 +121,15 @@
     <string name="lorem_ipsum">Okubekiwe</string>
     <string name="first_fragment_label">Isiqephu sokuqala</string>
     <string name="second_fragment_label">Isiqephu sesibili</string>
-    <string name="hello_blank_fragment">Sawubona</string>
+    <string name="quiet_level">Ukuthula</string>
+    <string name="format">Ifomethi</string>
+    <string name="open_to_all">Kuvulekele bonke abafundi</string>
+    <string name="indoor_online">Ngaphakathi / online</string>
+    <string name="wifi_yes">Wi‑Fi</string>
+    <string name="wifi_no">Ayikho i-Wi‑Fi</string>
+    <string name="air_con">Umoya oqandisiwe</string>
+    <string name="covered">Kumboziwe</string>
+    <string name="open_air">Emoyeni</string>
+    <string name="quiet_level_value">Ukuthula %1$d/5</string>
+    <string name="maps_coming">Kuvula imephu ye-%1$s</string>
 </resources>

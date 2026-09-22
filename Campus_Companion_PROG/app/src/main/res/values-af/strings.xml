@@ -121,5 +121,15 @@
     <string name="lorem_ipsum">Plekhouer</string>
     <string name="first_fragment_label">Eerste fragment</string>
     <string name="second_fragment_label">Tweede fragment</string>
-    <string name="hello_blank_fragment">Hallo</string>
+    <string name="quiet_level">Stilte</string>
+    <string name="format">Formaat</string>
+    <string name="open_to_all">Oop vir alle studente</string>
+    <string name="indoor_online">Binnenshuis / aanlyn</string>
+    <string name="wifi_yes">Wi‑Fi</string>
+    <string name="wifi_no">Geen Wi‑Fi</string>
+    <string name="air_con">Lugversorging</string>
+    <string name="covered">Oortrek</string>
+    <string name="open_air">Oop lug</string>
+    <string name="quiet_level_value">Stilte %1$d/5</string>
+    <string name="maps_coming">Maak kaart oop vir %1$s</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.example.campus_companion_prog.ui.activities
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -28,14 +30,16 @@ class LocationDetailActivity : LocalizedActivity() {
         binding.btnGetDirections.setOnClickListener {
             val loc = currentLocation
             if (loc == null) {
-                Toast.makeText(this, "Location not loaded yet", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.could_not_load), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            Toast.makeText(
-                this,
-                "Map: ${loc.latitude}, ${loc.longitude} (Maps SDK next)",
-                Toast.LENGTH_SHORT
-            ).show()
+            val uri = Uri.parse("geo:${loc.latitude},${loc.longitude}?q=${loc.latitude},${loc.longitude}(${Uri.encode(loc.name)})")
+            val mapIntent = Intent(Intent.ACTION_VIEW, uri)
+            if (mapIntent.resolveActivity(packageManager) != null) {
+                startActivity(mapIntent)
+            } else {
+                Toast.makeText(this, getString(R.string.maps_coming, loc.name), Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.btnBookmark.setOnClickListener {
@@ -49,7 +53,7 @@ class LocationDetailActivity : LocalizedActivity() {
                     .onFailure { error ->
                         Toast.makeText(
                             this@LocationDetailActivity,
-                            error.message ?: "Could not save",
+                            error.message ?: getString(R.string.could_not_save),
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -58,7 +62,7 @@ class LocationDetailActivity : LocalizedActivity() {
 
         val locationId = intent.getStringExtra(EXTRA_LOCATION_ID)
         if (locationId.isNullOrBlank()) {
-            Toast.makeText(this, "Missing location id", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.could_not_load), Toast.LENGTH_LONG).show()
             finish()
             return
         }
@@ -76,7 +80,7 @@ class LocationDetailActivity : LocalizedActivity() {
                 .onFailure { error ->
                     Toast.makeText(
                         this@LocationDetailActivity,
-                        error.message ?: "Could not load location",
+                        error.message ?: getString(R.string.could_not_load),
                         Toast.LENGTH_LONG
                     ).show()
                     finish()
@@ -87,23 +91,33 @@ class LocationDetailActivity : LocalizedActivity() {
     private fun populateLocationDetails(location: CampusLocation) {
         binding.tvCategoryTag.text = location.category.replace('_', ' ')
         binding.tvLocationTitle.text = location.name
-        binding.tvLocationSubtext.text =
-            "Quiet ${location.quietLevel}/5 • ${if (location.isIndoor) "Indoor" else "Outdoor"}"
+        binding.tvLocationSubtext.text = getString(
+            R.string.quiet_level_value,
+            location.quietLevel
+        ) + " • " + if (location.isIndoor) {
+            getString(R.string.marker_indoor)
+        } else {
+            getString(R.string.marker_outdoor)
+        }
+
         binding.tvHours.text = location.openingHours
-        binding.tvCapacity.text = if (location.hasWifi) "Wi‑Fi" else "No Wi‑Fi"
-        binding.tvStatus.text = when {
-            location.hasAirConditioning -> "Air‑con"
-            location.isCovered -> "Covered"
-            else -> "Open air"
+        // Middle card = quiet level (API has no seat capacity)
+        binding.tvCapacity.text = getString(R.string.quiet_level_value, location.quietLevel)
+        // Right card = indoor/outdoor format
+        binding.tvStatus.text = if (location.isIndoor) {
+            getString(R.string.marker_indoor)
+        } else {
+            getString(R.string.marker_outdoor)
         }
         binding.tvAboutDescription.text = location.description
 
         val facilities = buildList {
-            if (location.hasWifi) add("Wi‑Fi")
-            if (location.hasAirConditioning) add("Air conditioning")
-            if (location.isIndoor) add("Indoor")
-            if (location.isCovered) add("Covered")
-            add("Quiet ${location.quietLevel}/5")
+            if (location.hasWifi) add(getString(R.string.wifi_yes))
+            if (location.hasAirConditioning) add(getString(R.string.air_con))
+            if (location.isIndoor) add(getString(R.string.marker_indoor))
+            if (location.isCovered) add(getString(R.string.covered))
+            if (!location.isIndoor && !location.isCovered) add(getString(R.string.open_air))
+            add(getString(R.string.quiet_level_value, location.quietLevel))
         }
 
         binding.cgFacilities.removeAllViews()
