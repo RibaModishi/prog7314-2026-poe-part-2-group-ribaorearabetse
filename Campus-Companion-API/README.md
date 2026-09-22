@@ -151,11 +151,16 @@ The workflow automatically executes on pushes and pull requests to `main`, `mast
 - **Firebase Project** (Configured for project ID `campus-companion-d4052`).
 
 ### Firebase Credentials Setup
+
+**Android (Create Account / Sign In)** — no extra download needed after clone.  
+`Campus_Companion_PROG/app/google-services.json` is **included in this repo** so markers and teammates get a working Firebase Auth client config from GitHub alone.
+
+**Ktor API (Admin SDK)** — private key stays out of GitHub:
 1. Open [Firebase Console](https://console.firebase.google.com/) → **Project Settings** → **Service accounts**.
 2. Click **Generate new private key** to download your JSON credentials.
-3. Save the key as `firebase-service-account.json` in the project root directory (same folder as root `build.gradle.kts`). *Note: This file is git-ignored for security.*
-4. Enable **Firestore Database** and **Authentication** (Email/Password sign-in method) in Firebase Console.
-*(Refer to `firebase-service-account.example.json` for structure details).*
+3. Save as `firebase-service-account.json` in the project root (same folder as root `build.gradle.kts`). *Git-ignored.*
+4. Enable **Firestore Database** and **Authentication** (Email/Password) in Firebase Console.
+*(Refer to `firebase-service-account.example.json` for structure details.)*
 
 ### Environment Variables
 

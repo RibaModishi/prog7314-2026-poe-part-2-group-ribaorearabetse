@@ -9,11 +9,12 @@ build/
 out/
 .vscode/
 
-# Firebase / secrets - NEVER commit these
+# Firebase Admin private key — NEVER commit (server-only secret)
 firebase-service-account.json
 **/firebase-service-account.json
-**/google-services.json
 .env
+# google-services.json IS committed: it is the Android client config the marker
+# needs to run Create Account / Sign In after cloning from GitHub.
 
 # Local machine config
 local.properties
