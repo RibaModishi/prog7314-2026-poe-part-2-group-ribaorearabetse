@@ -1,131 +1,145 @@
-# Campus Companion 
+# Campus Companion
 
-Campus Companion is a multi-platform mobile and backend solution designed to streamline student life. It provides students with real-time campus navigation, event discovery, weather-aware recommendations, and personalized saved items through a Kotlin-based Android interface and a high-performance Ktor REST API backend.
+Campus Companion is a multi-platform mobile and backend solution designed to streamline student life. It provides students with real-time campus navigation, event discovery, weather-aware recommendations, and personalized saved items through a Kotlin Android app and a Ktor REST API backend.
 
 ---
 
 ## Table of Contents
-- [Project Overview](#-project-overview)
-- [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
-- [Tech Stack](#-tech-stack)
-- [Backend & API Architecture](#-backend--api-architecture)
-- [Android Frontend Architecture](#-android-frontend-architecture)
-- [Offline Capability & Synchronization](#-offline-capability--synchronization)
-- [Automated Testing & CI/CD](#-automated-testing--cicd)
-- [Setup & Installation](#-setup--installation)
-- [Firebase & Environment Setup](#-firebase--environment-setup)
-- [Team Roles & Responsibilities](#-team-roles--responsibilities)
-- [Rubric & Submission Evidence](#-rubric--submission-evidence)
+
+- [Project Overview](#project-overview)
+- [Key Features](#key-features)
+- [System Architecture](#system-architecture)
+- [Tech Stack](#tech-stack)
+- [Backend & API Architecture](#backend--api-architecture)
+- [Android Frontend Architecture](#android-frontend-architecture)
+- [Repository Structure](#repository-structure)
+- [Offline Capability & Synchronization](#offline-capability--synchronization)
+- [Automated Testing & CI/CD](#automated-testing--cicd)
+- [Setup & Prerequisites](#setup--prerequisites)
+- [Running locally](#running-locally--backend-server)
+- [Team Roles & Responsibilities](#team-roles--responsibilities)
+- [App Screenshots & UI Evidence](#app-screenshots--ui-evidence)
+- [Demo & Rubric Evidence](#demo--rubric-evidence)
 
 ---
 
 ## Project Overview
 
-Campus Companion bridges the gap between campus resources and students by providing a central digital hub. The system consists of:
-1. **Android Application**: Built with Kotlin and Jetpack Compose, offering an intuitive UI for navigation, weather updates, and event tracking.
-2. **Ktor REST API**: A lightweight backend built in Kotlin providing endpoints for user management, event data, and campus location endpoints. Android app never  [Ktor](https://ktor.io) 3.5.2 (Netty engine)
-talks to Firestore directly, it only talks to this API.
-3. **Database & Auth**: Firebase Firestore for real-time cloud persistence and Firebase Authentication for secure user sessions.
-4.  **Full endpoint reference:** [`docs/API_DOCUMENTATION.md`]
+Campus Companion bridges campus resources and students with a central digital hub:
 
----
-##  Key Features
-
-* ** Campus Navigator**: Smart map markers showing key locations, lecture halls, and facilities across campus.
-* ** Events & Opportunities**: Browse, search, and save upcoming campus events, academic deadlines, and social gatherings.
-* ** Weather-Aware Recommendations**: Integrates live weather data to give context-aware suggestions (e.g., indoor vs. outdoor activity recommendations).
-* ** Saved Items**: Allows students to bookmark key events and places for quick offline access.
-* ** Secure Authentication**: Firebase Auth integration supporting email/password sign-in and session security.
+1. **Android Application** — Kotlin + XML Views / Fragments / Navigation Component for campus navigation, weather context, events, and saved items.
+2. **Ktor REST API** — Kotlin backend ([Ktor](https://ktor.io) 3.5.2, Netty). The Android app never talks to Firestore directly; it only talks to this API.
+3. **Database & Auth** — Firebase Firestore for persistence and Firebase Authentication for user sessions.
+4. **Full endpoint reference:** [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)
 
 ---
 
-##  System Architecture
+## Key Features
+
+* **Campus Navigator** — Smart map markers for lecture halls, facilities, and other campus locations.
+* **Events & Opportunities** — Browse, search, and save campus events, deadlines, and gatherings.
+* **Weather-Aware Recommendations** — Live weather context (indoor vs outdoor suitability).
+* **Saved Items** — Bookmark events and places with offline queue support.
+* **Secure Authentication** — Firebase Auth email/password sign-in, optional biometric unlock.
+
+---
+
+## System Architecture
 
 ```
 Android App (Kotlin)
    │  Retrofit + Firebase Auth ID token
    ▼
-Campus Companion API (this repo - Ktor / Kotlin)
+Campus Companion API (this repo — Ktor / Kotlin)
    │  Firebase Admin SDK
    ▼
 Firebase (Firestore + Authentication)
 ```
 
-The Android app authenticates users directly against Firebase Auth (client SDK),
-then sends the resulting ID token to this API on every request that needs to know
-*who* is calling. This API is the **only** thing that reads/writes Firestore — the
-app never holds Firestore credentials.
+The Android app authenticates against Firebase Auth (client SDK), then sends the ID token to this API on every request that needs to know *who* is calling. This API is the **only** component that reads/writes Firestore — the app never holds Firestore credentials.
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
-* **Mobile Frontend**: Kotlin, Jetpack Compose, Material Design 3, Retrofit, Coroutines & Flow.
-* **Backend API**: Kotlin, Ktor 3.5.2 (Netty engine), ContentNegotiation, Kotlinx Serialization.
-* **Database & Auth**: Firebase Firestore (NoSQL), Firebase Authentication (Email/Password), Firebase Admin SDK.
-* **External Services**: OpenWeather API (Live weather data).
-* **CI/CD Pipeline**: GitHub Actions (`.github/workflows/ci.yml`) targeting Android and Ktor modules.
+* **Mobile Frontend:** Kotlin, Android XML Views, Fragments, Navigation Component, View Binding, Retrofit, Coroutines & Flow, Room, WorkManager.
+* **Backend API:** Kotlin, Ktor 3.5.2 (Netty), ContentNegotiation, Kotlinx Serialization.
+* **Database & Auth:** Firebase Firestore, Firebase Authentication (Email/Password), Firebase Admin SDK.
+* **External Services:** OpenWeather API.
+* **CI/CD:** GitHub Actions (`.github/workflows/ci.yml`) — backend + Android jobs.
 
 ---
 
-##  Backend & API Architecture
+## Backend & API Architecture
 
-The Ktor API manages user data, event persistence, and location queries via JSON endpoints.
+The Ktor API serves user profile, events, locations, favourites, weather, and health via JSON.
 
 ### Key API Endpoints
 
-| Method | Endpoint | Description | Auth Required |
+| Method | Endpoint | Description | Auth |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/health` | Server health and Firebase connection diagnostics | No |
-| `GET` | `/api/events` | Retrieves all upcoming campus events | No |
-| `GET` | `/api/events/{id}` | Retrieves detailed information for a specific event | No |
-| `GET` | `/api/locations` | Fetches campus map coordinates and markers | No |
-| `POST` | `/api/saved` | Saves an event or location to the user's saved list | Yes (Bearer Token) |
-| `GET` | `/api/weather` | Proxies weather condition requests | No |
+| `GET` | `/api/events` | Upcoming campus events | No |
+| `GET` | `/api/events/{id}` | Event detail | No |
+| `GET` | `/api/locations` | Campus map markers | No |
+| `GET` / `POST` / `DELETE` | `/api/favourites` (+ `/sync`) | Saved items list, save, remove, offline replay | Yes (Bearer) |
+| `GET` | `/api/users/me` | Signed-in profile | Yes (Bearer) |
+| `PUT` | `/api/users/me/settings` | Preferences (e.g. language) | Yes (Bearer) |
+| `GET` | `/api/weather` | Weather proxy for recommendations | No |
 
-*Full endpoint specifications: [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)*  
-*Backend handover guidelines: [`docs/HANDOVER.md`](docs/HANDOVER.md)*
+*Full specs: [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)*  
+*Handover: [`docs/HANDOVER.md`](docs/HANDOVER.md)*
 
 ---
 
+## Android Frontend Architecture
+
+```
+Activities (SignIn, CreateAccount, Main, Settings, Details)
+   │
+   ├── Fragments (Home, Navigate, Events, Saved) via NavHost
+   ├── Retrofit clients → Ktor API (Bearer Firebase ID token)
+   ├── Firebase Auth (createUser / signIn)
+   ├── Room + WorkManager (offline favourites queue)
+   ├── BiometricHelper (optional unlock)
+   └── FCM CampusMessagingService
+```
+
+Domain rules for weather recommendations live in `WeatherRules` (unit-tested). Localisation uses `LocaleHelper` plus `values`, `values-zu`, and `values-af`.
+
+---
 
 ## Repository Structure
+
 ```
 .
-├── .github/
-│   └── workflows/
-│       └── ci.yml                             # GitHub Actions CI pipeline
-├── Campus_Companion_PROG/                     # Android App (Mobile Frontend Module)
+├── .github/workflows/ci.yml                   # GitHub Actions CI
+├── Campus_Companion_PROG/                     # Android app
 │   ├── app/
-│   │   └── src/
-│   │       ├── main/java/                     # Kotlin source code & Jetpack Compose UI
-│   │       └── res/                           # UI resources & assets
+│   │   ├── google-services.json               # Firebase client config (committed)
+│   │   └── src/main/java/ … /res/
 │   ├── build.gradle.kts
 │   └── gradlew
-├── src/main/kotlin/com/campuscompanion/api/    # Ktor Backend API Module
-│   ├── Application.kt                         # Entry point (embeddedServer & plugin wiring)
-│   ├── config/                                # Environment-driven config & Firebase Admin setup
-│   ├── plugins/                               # Serialization, CORS, error handling, routing
-│   ├── models/                                # Domain models & request DTOs
-│   ├── repositories/                          # Firestore reads/writes
-│   ├── routes/                                # Feature route handlers
-│   ├── services/                              # OpenWeather API integration
-│   └── data/                                  # SeedData.kt for locations & events
-├── docs/                                      # API documentation & handover notes
-├── postman/                                   # Postman test collection
-├── build.gradle.kts                           # Root build script
-├── gradlew                                    # Gradle wrapper
-└── README.md                                  # Combined technical documentation
+├── src/main/kotlin/com/campuscompanion/api/   # Ktor API
+│   ├── Application.kt
+│   ├── config/  plugins/  models/
+│   ├── repositories/  routes/  services/  data/
+├── src/test/kotlin/…                          # Backend unit tests
+├── docs/                                      # API docs, screenshots, demo checklist
+├── postman/                                   # Postman collection
+├── build.gradle.kts
+├── gradlew
+└── README.md
 ```
+
 ---
 
-##  Offline Capability(POE) & Synchronization
+## Offline Capability & Synchronization
 
 Favourites use an offline-first path in the Android app:
 
-1. **Room queue** (`PendingSyncActionEntity`) — when `POST /api/favourites` fails with a network error, the save/remove is written to a local Room table.
-2. **WorkManager** (`FavouriteSyncWorker`) — scheduled with `NetworkType.CONNECTED`; flushes the queue via `POST /api/favourites/sync`.
+1. **Room queue** (`PendingSyncActionEntity`) — when `POST /api/favourites` fails with a network error, the action is stored locally.
+2. **WorkManager** (`FavouriteSyncWorker`) — runs when `NetworkType.CONNECTED`; flushes via `POST /api/favourites/sync`.
 3. **User feedback** — toast: “Saved offline — will sync when you reconnect.”
 4. **Graceful UX** — Saved / Navigate / Events still load from the API when online; offline writes do not block the UI.
 
@@ -133,48 +147,61 @@ Code: `FavouriteOfflineRepository`, `AppDatabase`, `FavouriteSyncWorker`.
 
 ---
 
-##  Automated Testing & CI/CD
+## Automated Testing & CI/CD
 
-Continuous Integration is executed using **GitHub Actions** (`.github/workflows/ci.yml`).
+**Yes — automated testing is in place** and runs on every push/PR to `main`, `master`, and `develop`.
 
-The workflow automatically executes on pushes and pull requests to `main`, `master`, and `develop`:
-* **Backend Tests Job**: Configures JDK 17, sets `GRADLE_OPTS`, compiles Ktor sources, and runs server-side unit tests (`./gradlew test`).
-* **Android Tests Job**: Configures JDK 17, sets up Android SDK (`cmdline-tools-version: 11076708`), compiles Android modules, executes unit tests (`./gradlew testDebugUnitTest`), and compiles the debug APK (`./gradlew assembleDebug`).
+| Layer | What runs | Where |
+| :--- | :--- | :--- |
+| Backend unit tests | `./gradlew test` | `src/test/…` e.g. `ValidationTest`, `RecommendationRoutesTest` |
+| Android unit tests | `./gradlew testDebugUnitTest` | e.g. `WeatherRulesTest`, `ExampleUnitTest` |
+| Debug APK build | `./gradlew assembleDebug` | Confirms the Android module compiles in CI |
+
+Workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+
+* **Backend tests job** — JDK 17, compiles Ktor, runs `./gradlew test`
+* **Android tests job** — JDK 17 + Android SDK, `testDebugUnitTest`, then `assembleDebug`
+
+Recent green evidence: [`docs/screenshots/ci-green.png`](docs/screenshots/ci-green.png) and [Actions runs](https://github.com/KChabeli/campus-companion-api/actions).
+
+Manual API checks (Postman) complement CI but are separate from the automated Gradle/GitHub Actions pipeline.
 
 ---
 
-##  Setup & Prerequisites
+## Setup & Prerequisites
 
 ### Prerequisites
-- **JDK 17+** (The included Gradle wrapper pins Gradle 9.7.1, supporting JDK 17–26).
+
+- **JDK 17+** (Gradle wrapper supports JDK 17–26).
 - **Android Studio Ladybug** or newer.
-- **Firebase Project** (Configured for project ID `campus-companion-d4052`).
+- **Firebase project** `campus-companion-d4052`.
 
 ### Firebase Credentials Setup
 
-**Android (Create Account / Sign In)** — no extra download needed after clone.  
+**Android (Create Account / Sign In)** — no extra download after clone.  
 `Campus_Companion_PROG/app/google-services.json` is **included in this repo** so markers and teammates get a working Firebase Auth client config from GitHub alone.
 
 **Ktor API (Admin SDK)** — private key stays out of GitHub:
-1. Open [Firebase Console](https://console.firebase.google.com/) → **Project Settings** → **Service accounts**.
-2. Click **Generate new private key** to download your JSON credentials.
-3. Save as `firebase-service-account.json` in the project root (same folder as root `build.gradle.kts`). *Git-ignored.*
-4. Enable **Firestore Database** and **Authentication** (Email/Password) in Firebase Console.
-*(Refer to `firebase-service-account.example.json` for structure details.)*
+
+1. [Firebase Console](https://console.firebase.google.com/) → **Project Settings** → **Service accounts**.
+2. **Generate new private key**.
+3. Save as `firebase-service-account.json` at the project root (same folder as root `build.gradle.kts`). *Git-ignored.*
+4. Enable **Firestore** and **Authentication → Email/Password**.
+
+*(Structure reference: `firebase-service-account.example.json`.)*
 
 ### Environment Variables
 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |
-| `PORT` | `8090` | Ktor HTTP server port |
-| `FIREBASE_CREDENTIALS_PATH` | `firebase-service-account.json` | Path to service-account JSON |
+| `PORT` | `8090` | Ktor HTTP port |
+| `FIREBASE_CREDENTIALS_PATH` | `firebase-service-account.json` | Service-account JSON path |
 | `FIREBASE_PROJECT_ID` | `campus-companion-d4052` | Firebase project ID |
-| `ALLOWED_CORS_ORIGINS` | `*` | Allowed CORS origins |
-| `AUTH_ENABLED` | `true` | Set `false` **only** for local debug testing without tokens |
-| `OPENWEATHER_API_KEY` | *(unset)* | OpenWeather API key for live context recommendations |
+| `ALLOWED_CORS_ORIGINS` | `*` | CORS origins |
+| `AUTH_ENABLED` | `true` | Set `false` **only** for local debug without tokens |
+| `OPENWEATHER_API_KEY` | *(unset)* | Live weather recommendations |
 
 ---
-
 
 ## Running locally & Backend Server
 
@@ -186,129 +213,105 @@ The workflow automatically executes on pushes and pull requests to `main`, `mast
 ./gradlew run
 ```
 
-The server starts on `http://localhost:8090` (or `$PORT`). Confirm it's healthy:
+Server: `http://localhost:8090` (or `$PORT`). Health check:
 
 ```bash
 curl http://localhost:8090/health
 ```
 
-- `"status": "ok"` → Firebase is configured correctly.
-- `"status": "degraded"` (HTTP 503) → credentials are missing/invalid; every other
-  endpoint will return a clear `500 service_unavailable` JSON error until this is fixed.
-  This is intentional: the server still boots so teammates can pull the repo and see
-  it run before Firebase is wired up.
+- `"status": "ok"` → Firebase Admin is configured.
+- `"status": "degraded"` (HTTP 503) → credentials missing/invalid; other endpoints return `500 service_unavailable` until fixed. The server still boots so the repo can be run before Firebase is wired up.
 
 ### Testing without real Firebase ID tokens
 
-Firebase ID tokens are short-lived and normally come from the Android app's sign-in
-flow. For quick backend-only testing, set `AUTH_ENABLED=false` and send any string as
-an `X-Debug-Uid` header instead of `Authorization: Bearer ...` — **this must stay
-`true` (default) for anything resembling a real/graded deployment.**
+For backend-only testing, set `AUTH_ENABLED=false` and send any string as `X-Debug-Uid` instead of `Authorization: Bearer ...`. Keep `AUTH_ENABLED=true` for anything resembling a graded deployment.
 
-To test with a **real** token instead, sign in via the Firebase Auth REST API using your
-project's Web API key (Firebase Console → Project Settings → General → Web API Key):
+For a **real** token, sign in via the Firebase Auth REST API (Console → Project Settings → General → Web API Key):
 
 ```bash
 curl -X POST "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=YOUR_WEB_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"email":"test@student.ac.za","password":"Password123!","returnSecureToken":true}'
 ```
-Copy the `idToken` from the response into the `idToken` collection variable in Postman.
 
-## Seeding sample data
+Copy `idToken` into the Postman collection variable.
 
-Populates Firestore with 10 campus locations (all 8 categories) and 8 events/opportunities
-(all 5 types), so the API is demo-ready immediately:
+### Seeding sample data
 
 ```bash
 ./gradlew seed
 ```
 
-Safe to re-run — it skips seeding a collection that's already non-empty.
+Loads sample locations and events. Safe to re-run — skips non-empty collections.
 
-## Testing the API
+### Testing the API (Postman)
 
-1. Import [`postman/CampusCompanion.postman_collection.json`](postman/CampusCompanion.postman_collection.json) into Postman.
-2. Set the collection variables `baseUrl` (e.g. `http://localhost:8090`) and `idToken`
-   (see above).
-3. Run requests top-to-bottom; save a screenshot of each folder's results (or use
-   Postman's "Run Collection" for one combined report) as your API-testing evidence.
-4. The collection includes deliberate failure cases (missing auth, invalid category,
-   etc.) so you can show `400`/`401`/`404` responses too, not just happy paths.
+1. Import [`postman/CampusCompanion.postman_collection.json`](postman/CampusCompanion.postman_collection.json).
+2. Set `baseUrl` (e.g. `http://localhost:8090`) and `idToken`.
+3. Run requests; keep screenshots / collection runner output as API-testing evidence.
+4. Collection includes failure cases (`400` / `401` / `404`), not only happy paths.
 
-## Deployment
+### Deployment
 
-Any container-friendly host works since this is a plain Ktor/Netty app. Two straightforward
-options for this module:
+**Option A — Google Cloud Run**
 
-**Option A — Google Cloud Run (recommended, same ecosystem as Firebase)**
 ```bash
-# from the project root
 gcloud run deploy campus-companion-api \
   --source . \
   --region europe-west1 \
   --allow-unauthenticated \
   --set-env-vars FIREBASE_PROJECT_ID=campus-companion-d4052
 ```
-Cloud Run builds the included `Dockerfile` automatically. Upload the real
-`firebase-service-account.json` as a Secret Manager secret and mount it at
-`/app/firebase-service-account.json` (Cloud Run → Edit & Deploy → Variables & Secrets),
-rather than baking it into the image.
 
-**Option B — Render / Railway (simplest free-tier option)**
-- New Web Service → connect this repo → it detects the `Dockerfile` automatically.
-- Add `firebase-service-account.json` as a "Secret File" and set
-  `FIREBASE_CREDENTIALS_PATH` to wherever the host mounts it.
-- Set `PORT` if the platform requires a specific value (most inject it automatically).
+Mount `firebase-service-account.json` via Secret Manager; do not bake it into the image.
 
-## Team ownership (from the Revised Task 1 Plan)
-
-This repo implements the **Backend, Database, Authentication & API** column below;
-see the Planning & Design / Revised Task 1 Plan documents for the full breakdown.
-
-| Owner    | Area |
-|----------|------|
-| Khumo-Thato Chabeli | Kotlin Ktor backend, Firestore, Firebase Auth token validation, all REST endpoints, seed data, API docs & Postman evidence *(this repo)* |
-| Khensani Maluleke   | Android UI/UX, screens, navigation, design system, README/screenshots (Android app repo) |
-| Orearabetse Riba    | Domain models/DTOs, weather-recommendation business rules, validation rules, unit tests (Android app repo / shared logic) |
+**Option B — Render / Railway** — connect the repo (Dockerfile), add the service-account as a secret file, set `FIREBASE_CREDENTIALS_PATH` (and `PORT` if required).
 
 ---
 
-##  App Screenshots & UI Evidence
+## Team Roles & Responsibilities
 
-Below is a breakdown of the core user interface and features implemented in the Campus Companion Android application:
+| Owner | Area |
+| :--- | :--- |
+| Khumo-Thato Chabeli | Kotlin Ktor backend, Firestore, Firebase Auth token validation, REST endpoints, seed data, API docs & Postman evidence |
+| Khensani Maluleke | Android UI/UX, screens, navigation, design system, README/screenshots |
+| Orearabetse Riba | Domain models/DTOs, weather-recommendation business rules, validation, unit tests, Android↔API integration |
+
+---
+
+## App Screenshots & UI Evidence
 
 | Feature / Screen | Preview | Description |
 | :--- | :---: | :--- |
-| **Authentication & Sign-In** | ![Sign In Screen]<img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/06b7f5ae-dcf5-4e78-a6cd-80ab1d1d7e22" />
- | Secure student login and registration backed by Firebase Auth tokens. |
-| **User Profile** | <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/d55fa015-856d-4cf1-9e40-9ff0e952d450" />
- | Displays student details, account information, and personal preferences. |
-| **Campus Navigator (Map)** | <img width="360" alt="Campus Navigator with smart weather markers" src="docs/screenshots/campus-navigator.png" /> | Interactive campus locations with weather-aware smart markers (recommended / indoor / outdoor / less suitable). |
-| **Events & Opportunities** | <img width="360" alt="Events list with outdoor weather banners" src="docs/screenshots/events.png" /> | Campus events and opportunities from the API, with weather banners on outdoor events only. |
-| **Saved Items (Bookmarks)** | <img width="360" alt="Saved Items" src="docs/screenshots/saved-items.png" /> | Personal bookmarking view with local offline caching support for quick access without network. |
-| **App Settings** | <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/dd72c00b-643c-434b-8e14-859d6915d1ce" />
- | Application configuration options including language options, theme toggles, and notification settings. |
-| **GitHub Actions CI/CD** | <img width="1080" alt="Green Campus Companion CI run" src="docs/screenshots/ci-green.png" /> | Automated build and test pipeline — Backend tests + Android unit tests/APK both green ([run #13](https://github.com/KChabeli/campus-companion-api/actions/runs/35665939256)). |
-## Demo & Rubric Evidence 
+| **Authentication & Sign-In** | <img width="360" alt="Sign In" src="https://github.com/user-attachments/assets/06b7f5ae-dcf5-4e78-a6cd-80ab1d1d7e22" /> | Firebase Auth Create Account / Sign In |
+| **User Profile** | <img width="360" alt="Profile" src="https://github.com/user-attachments/assets/d55fa015-856d-4cf1-9e40-9ff0e952d450" /> | Profile and preferences from `GET /api/users/me` |
+| **Campus Navigator** | <img width="360" alt="Campus Navigator" src="docs/screenshots/campus-navigator.png" /> | Locations with weather-aware smart markers |
+| **Events & Opportunities** | <img width="360" alt="Events" src="docs/screenshots/events.png" /> | Events from the API with outdoor weather banners |
+| **Saved Items** | <img width="360" alt="Saved Items" src="docs/screenshots/saved-items.png" /> | Bookmarks with offline queue support |
+| **App Settings** | <img width="360" alt="Settings" src="https://github.com/user-attachments/assets/dd72c00b-643c-434b-8e14-859d6915d1ce" /> | Language (`en`/`zu`/`af`), biometrics, notifications |
+| **GitHub Actions CI** | <img width="720" alt="Green CI" src="docs/screenshots/ci-green.png" /> | Backend + Android tests/APK green |
 
-- **Demo video checklist (physical phone):** [`docs/DEMO_VIDEO_CHECKLIST.md`](docs/DEMO_VIDEO_CHECKLIST.md)
+---
+
+## Demo & Rubric Evidence
+
+- **Demo video checklist:** [`docs/DEMO_VIDEO_CHECKLIST.md`](docs/DEMO_VIDEO_CHECKLIST.md)
 - Demo Video (YouTube unlisted): *[paste link after recording]*
 - API Documentation: [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)
 - Postman Collection: [`postman/CampusCompanion.postman_collection.json`](postman/CampusCompanion.postman_collection.json)
 - Android integration kit: [`docs/android-integration/`](docs/android-integration/)
-- CI workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (backend `./gradlew test` + Android `testDebugUnitTest` / `assembleDebug`)
+- CI workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 
-### Rubric feature map (Android + API)
+### Rubric feature map
 
 | Rubric item | Evidence in repo |
 | :--- | :--- |
-| Auth / SSO | Firebase Email/Password Create Account + Sign In; optional biometric unlock |
-| Settings | Profile from `GET /api/users/me`; language `en`/`zu`/`af` (API + `LocaleHelper` + `values-zu`/`values-af`) |
+| Auth / SSO | Firebase Email/Password; optional biometric unlock |
+| Settings | `GET /api/users/me`; language `en`/`zu`/`af` |
 | REST round-trips | Locations, Events, Favourites, Weather via Retrofit → Ktor |
 | Offline sync | Room + WorkManager favourite queue |
-| Push notifications | FCM `CampusMessagingService` + local token store |
+| Push notifications | FCM `CampusMessagingService` |
 | Biometrics | `BiometricHelper` + Settings toggle |
-| Unit tests | `WeatherRulesTest` (Android); backend tests under `src/test` |
-| CI/CD | GitHub Actions `ci.yml` |
-| Custom weather features | `WeatherRules` + Home / Navigate smart markers / Event outdoor banner |
+| Unit tests | `WeatherRulesTest` (Android); `ValidationTest`, `RecommendationRoutesTest` (API) |
+| CI/CD | GitHub Actions `ci.yml` (automated on every push) |
+| Custom weather features | `WeatherRules` + Home / Navigate markers / Event outdoor banner |
