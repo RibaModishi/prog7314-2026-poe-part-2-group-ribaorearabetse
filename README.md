@@ -283,9 +283,9 @@ Mount `firebase-service-account.json` via Secret Manager; do not bake it into th
 | :--- | :---: | :--- |
 | **Authentication & Sign-In** | <img width="360" alt="Sign In" src="https://github.com/user-attachments/assets/06b7f5ae-dcf5-4e78-a6cd-80ab1d1d7e22" /> | Firebase Auth Create Account / Sign In |
 | **User Profile** | <img width="360" alt="Profile" src="https://github.com/user-attachments/assets/d55fa015-856d-4cf1-9e40-9ff0e952d450" /> | Profile and preferences from `GET /api/users/me` |
-| **Campus Navigator** | <img width="360" alt="Campus Navigator" src="docs/screenshots/campus-navigator.png" /> | Locations with weather-aware smart markers |
-| **Events & Opportunities** | <img width="360" alt="Events" src="docs/screenshots/events.png" /> | Events from the API with outdoor weather banners |
-| **Saved Items** | <img width="360" alt="Saved Items" src="docs/screenshots/saved-items.png" /> | Bookmarks with offline queue support |
+| **Campus Navigator** | <img width="360" alt="Campus Navigator" src="Campus-Companion-API/docs/screenshots/campus-navigator.png" /> | Locations with weather-aware smart markers |
+| **Events & Opportunities** | <img width="360" alt="Events" src="Campus-Companion-API/docs/screenshots/events.png" /> | Events from the API with outdoor weather banners |
+| **Saved Items** | <img width="360" alt="Saved Items" src="campus-companion-api/docs/screenshots/saved-items.png" /> | Bookmarks with offline queue support |
 | **App Settings** | <img width="360" alt="Settings" src="https://github.com/user-attachments/assets/dd72c00b-643c-434b-8e14-859d6915d1ce" /> | Language (`en`/`zu`/`af`), biometrics, notifications |
 | **GitHub Actions CI** | <img width="1505" height="932" alt="image" src="https://github.com/user-attachments/assets/ae27f6b9-cbe8-4652-947e-b59d17192f53" /> | Backend + Android tests/APK green |
 
