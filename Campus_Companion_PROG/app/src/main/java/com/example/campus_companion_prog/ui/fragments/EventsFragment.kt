@@ -67,10 +67,10 @@ class EventsFragment : Fragment() {
                 Toast.makeText(requireContext(), error.message ?: "Could not load events", Toast.LENGTH_LONG).show()
                 return@launch
             }
-            allEvents = eventsResult.getOrThrow()
+            allEvents = eventsResult.getOrThrow().orEmpty()
 
             weatherResult.onSuccess { weather ->
-                weatherCondition = weather.condition
+                weatherCondition = weather.condition.orEmpty().ifBlank { weatherCondition }
             }
 
             warningById = warningsResult.getOrNull()
@@ -134,7 +134,7 @@ class EventsFragment : Fragment() {
                 event.description.contains(searchQuery, ignoreCase = true) ||
                 event.organiser.contains(searchQuery, ignoreCase = true) ||
                 event.type.contains(searchQuery, ignoreCase = true) ||
-                event.tags.any { it.contains(searchQuery, ignoreCase = true) }
+                event.tags.orEmpty().any { it.contains(searchQuery, ignoreCase = true) }
             matchesType && matchesSearch
         }
         adapter.submitList(

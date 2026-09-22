@@ -3,12 +3,15 @@ package com.example.campus_companion_prog.api
 import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 /**
@@ -28,34 +31,52 @@ object RetrofitClient {
     /** Emulator-friendly default — change when testing on a physical device. */
     private const val BASE_URL = "http://10.0.2.2:8090/"
 
+    private const val TOKEN_TIMEOUT_SECONDS = 12L
+
+    /**
+     * [Tasks.await] on the thread that is waiting for the token deadlocks:
+     * Firebase posts the result back to that same thread. Read the token on
+     * this pool instead, and give up after [TOKEN_TIMEOUT_SECONDS].
+     */
+    private val tokenExecutor = Executors.newCachedThreadPool()
+
     private val authInterceptor = Interceptor { chain ->
         val user = FirebaseAuth.getInstance().currentUser
-        val request = if (user != null) {
-            val token = try {
-                Tasks.await(user.getIdToken(false)).token
-            } catch (ex: Exception) {
-                Log.w(TAG, "Failed to fetch Firebase ID token", ex)
-                null
-            }
-            if (token != null) {
-                Log.d(TAG, "Attaching Bearer token for uid=${user.uid}")
-                chain.request().newBuilder()
-                    .addHeader("Authorization", "Bearer $token")
-                    .build()
-            } else {
-                chain.request()
-            }
+        val token = user?.let { firebaseIdToken(it) }
+        val request = if (token != null) {
+            Log.d(TAG, "Attaching Bearer token for uid=${user.uid}")
+            chain.request().newBuilder()
+                .header("Authorization", "Bearer $token")
+                .build()
         } else {
-            Log.d(TAG, "No signed-in user — sending request without auth header")
+            if (user == null) {
+                Log.d(TAG, "No signed-in user — sending request without auth header")
+            }
             chain.request()
         }
         chain.proceed(request)
+    }
+
+    private fun firebaseIdToken(user: FirebaseUser): String? {
+        return try {
+            tokenExecutor.submit(Callable {
+                Tasks.await(
+                    user.getIdToken(false),
+                    TOKEN_TIMEOUT_SECONDS,
+                    TimeUnit.SECONDS
+                ).token
+            }).get(TOKEN_TIMEOUT_SECONDS + 2, TimeUnit.SECONDS)
+        } catch (ex: Exception) {
+            Log.w(TAG, "Failed to fetch Firebase ID token", ex)
+            null
+        }
     }
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(authInterceptor)
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
+        .callTimeout(30, TimeUnit.SECONDS)
         .build()
 
     val api: CampusCompanionApi by lazy {

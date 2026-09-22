@@ -100,7 +100,7 @@ class SavedFragment : Fragment() {
                 return@launch
             }
 
-            val favourites = favouritesResult.getOrThrow()
+            val favourites = favouritesResult.getOrThrow().orEmpty()
             val locationsById = locationsResult.getOrDefault(emptyList()).associateBy { it.id }
             val eventsById = eventsResult.getOrDefault(emptyList()).associateBy { it.id }
 

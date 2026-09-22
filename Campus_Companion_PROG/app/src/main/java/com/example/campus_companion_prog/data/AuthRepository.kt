@@ -12,7 +12,10 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeout
 import retrofit2.HttpException
 
 /**
@@ -27,6 +30,9 @@ class AuthRepository(
 
     companion object {
         private const val TAG = "AuthRepository"
+        private const val AUTH_TIMEOUT_MS = 20_000L
+        private const val TIMEOUT_MESSAGE =
+            "That took too long. Check your connection, then try again."
         private val EMAIL_REGEX = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
     }
 
@@ -46,20 +52,27 @@ class AuthRepository(
 
         return try {
             Log.i(TAG, "Registering new account for $normalisedEmail")
-            val authResult = auth.createUserWithEmailAndPassword(normalisedEmail, password).await()
-            val user = authResult.user
-                ?: return Result.failure(IllegalStateException("Firebase returned no user"))
-
-            user.updateProfile(
-                UserProfileChangeRequest.Builder()
-                    .setDisplayName(name)
-                    .build()
-            ).await()
+            val user = withTimeout(AUTH_TIMEOUT_MS) {
+                val authResult = auth.createUserWithEmailAndPassword(normalisedEmail, password).await()
+                val created = authResult.user
+                    ?: throw IllegalStateException("Firebase returned no user")
+                created.updateProfile(
+                    UserProfileChangeRequest.Builder()
+                        .setDisplayName(name)
+                        .build()
+                ).await()
+                created
+            }
 
             Log.i(TAG, "Firebase user created uid=${user.uid} — upserting API profile")
-            val profile = upsertProfileFor(user, nameOverride = name)
+            val profile = syncProfileOrLocal(user, name)
             Log.i(TAG, "Profile ready uid=${profile.uid} name=${profile.name}")
             Result.success(profile)
+        } catch (ex: TimeoutCancellationException) {
+            Log.e(TAG, "Register timed out", ex)
+            Result.failure(IllegalStateException(TIMEOUT_MESSAGE))
+        } catch (ex: CancellationException) {
+            throw ex
         } catch (ex: FirebaseAuthUserCollisionException) {
             Log.e(TAG, "Email already registered", ex)
             Result.failure(
@@ -85,13 +98,19 @@ class AuthRepository(
 
         return try {
             Log.i(TAG, "Signing in $normalisedEmail")
-            val authResult = auth.signInWithEmailAndPassword(normalisedEmail, password).await()
-            val user = authResult.user
-                ?: return Result.failure(IllegalStateException("Firebase returned no user"))
+            val user = withTimeout(AUTH_TIMEOUT_MS) {
+                val authResult = auth.signInWithEmailAndPassword(normalisedEmail, password).await()
+                authResult.user ?: throw IllegalStateException("Firebase returned no user")
+            }
 
-            val profile = upsertProfileFor(user)
+            val profile = syncProfileOrLocal(user, nameOverride = null)
             Log.i(TAG, "Sign-in OK uid=${profile.uid} name=${profile.name}")
             Result.success(profile)
+        } catch (ex: TimeoutCancellationException) {
+            Log.e(TAG, "Sign-in timed out", ex)
+            Result.failure(IllegalStateException(TIMEOUT_MESSAGE))
+        } catch (ex: CancellationException) {
+            throw ex
         } catch (ex: FirebaseAuthInvalidCredentialsException) {
             Log.e(TAG, "Invalid credentials code=${ex.errorCode}", ex)
             Result.failure(IllegalArgumentException("Incorrect email or password."))
@@ -141,12 +160,43 @@ class AuthRepository(
         }
     }
 
-    suspend fun upsertProfileFor(user: FirebaseUser, nameOverride: String? = null): UserProfile {
-        val displayName = nameOverride
+    /**
+     * Saves the profile on the API. If that server is down, still return a
+     * local profile so signup can open the app instead of sitting on Creating….
+     */
+    private suspend fun syncProfileOrLocal(user: FirebaseUser, nameOverride: String?): UserProfile {
+        return try {
+            upsertProfileFor(user, nameOverride)
+        } catch (ex: CancellationException) {
+            throw ex
+        } catch (ex: Exception) {
+            Log.e(TAG, "API profile sync failed; continuing with the Firebase profile", ex)
+            localProfile(user, nameOverride)
+        }
+    }
+
+    private fun localProfile(user: FirebaseUser, nameOverride: String?): UserProfile {
+        val now = System.currentTimeMillis()
+        return UserProfile(
+            uid = user.uid,
+            name = displayNameFor(user, nameOverride),
+            email = user.email.orEmpty(),
+            preferredLanguage = "en",
+            createdAt = now,
+            updatedAt = now
+        )
+    }
+
+    private fun displayNameFor(user: FirebaseUser, nameOverride: String?): String {
+        return nameOverride
             ?.takeIf { it.isNotBlank() }
             ?: user.displayName?.takeIf { it.isNotBlank() }
             ?: user.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() }
             ?: "Student"
+    }
+
+    suspend fun upsertProfileFor(user: FirebaseUser, nameOverride: String? = null): UserProfile {
+        val displayName = displayNameFor(user, nameOverride)
 
         return RetrofitClient.api.upsertProfile(
             UpsertProfileRequest(

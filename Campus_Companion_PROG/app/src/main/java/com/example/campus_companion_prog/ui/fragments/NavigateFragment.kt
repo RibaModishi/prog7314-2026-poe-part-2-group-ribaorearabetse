@@ -68,19 +68,19 @@ class NavigateFragment : Fragment() {
                 return@launch
             }
 
-            allLocations = locationsResult.getOrThrow()
+            allLocations = locationsResult.getOrThrow().orEmpty()
 
             weatherResult.onSuccess { weather ->
-                weatherCondition = weather.condition
-                statusById = weather.allLocationsWithStatus.associate {
+                weatherCondition = weather.condition.orEmpty().ifBlank { "CLEAR" }
+                statusById = weather.allLocationsWithStatus.orEmpty().associate {
                     it.location.id to it.status
                 }
                 if (statusById.isEmpty()) {
                     // Fallback: compute locally with Riba's rules
-                    statusById = allLocations.associate { it.id to WeatherRules.locationStatus(it, weather.condition) }
+                    statusById = allLocations.associate { it.id to WeatherRules.locationStatus(it, weather.condition.orEmpty()) }
                 }
                 binding.tvMapPlaceholder.text =
-                    "${getString(R.string.smart_markers)} • ${WeatherRules.localizedCondition(requireContext(), weather.condition)}"
+                    "${getString(R.string.smart_markers)} • ${WeatherRules.localizedCondition(requireContext(), weather.condition.orEmpty())}"
                 Log.i(TAG, "Weather=${weather.condition} markers=${statusById.size}")
             }.onFailure {
                 statusById = allLocations.associate { it.id to WeatherRules.locationStatus(it, weatherCondition) }

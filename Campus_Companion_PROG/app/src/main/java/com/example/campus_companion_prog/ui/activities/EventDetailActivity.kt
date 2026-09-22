@@ -85,7 +85,7 @@ class EventDetailActivity : LocalizedActivity() {
         } else {
             getString(R.string.indoor_online)
         }
-        binding.tvEligibility.text = event.tags.joinToString(", ")
+        binding.tvEligibility.text = event.tags.orEmpty().joinToString(", ")
             .ifBlank { getString(R.string.open_to_all) }
         binding.tvAbout.text = event.description
     }

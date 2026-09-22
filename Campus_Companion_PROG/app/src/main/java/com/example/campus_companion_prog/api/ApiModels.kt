@@ -53,7 +53,7 @@ data class EventOrOpportunity(
     val locationId: String?,
     val externalUrl: String?,
     val isOutdoor: Boolean,
-    val tags: List<String>,
+    val tags: List<String>? = emptyList(),
     val createdAt: Long
 )
 
@@ -97,9 +97,9 @@ data class WeatherRecommendation(
     val condition: String,
     val temperatureCelsius: Double?,
     val message: String,
-    val recommendedLocationIds: List<String>,
-    val recommendedLocations: List<CampusLocation> = emptyList(),
-    val allLocationsWithStatus: List<LocationWeatherInfo> = emptyList()
+    val recommendedLocationIds: List<String>? = emptyList(),
+    val recommendedLocations: List<CampusLocation>? = emptyList(),
+    val allLocationsWithStatus: List<LocationWeatherInfo>? = emptyList()
 )
 
 data class LocationWeatherInfo(

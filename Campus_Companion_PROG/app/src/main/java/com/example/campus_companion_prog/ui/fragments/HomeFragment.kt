@@ -102,17 +102,19 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             campusRepository.getWeatherRecommendation(mockCondition)
                 .onSuccess { weather ->
-                    Log.i(TAG, "Weather ${weather.condition} recommended=${weather.recommendedLocations.size}")
+                    val locationsWithStatus = weather.allLocationsWithStatus.orEmpty()
+                    val recommendedLocations = weather.recommendedLocations.orEmpty()
+                    Log.i(TAG, "Weather ${weather.condition} recommended=${recommendedLocations.size}")
                     val temp = weather.temperatureCelsius?.let { "${it.toInt()}°C" } ?: ""
                     binding.tvWeatherCondition.text =
-                        "${WeatherRules.conditionDisplayName(weather.condition)} $temp".trim()
-                    binding.tvWeatherMessage.text = weather.message
+                        "${WeatherRules.conditionDisplayName(weather.condition.orEmpty())} $temp".trim()
+                    binding.tvWeatherMessage.text = weather.message.orEmpty()
 
-                    val statusById = weather.allLocationsWithStatus.associate {
+                    val statusById = locationsWithStatus.associate {
                         it.location.id to it.status
                     }
-                    val recommended = weather.recommendedLocations.ifEmpty {
-                        weather.allLocationsWithStatus
+                    val recommended = recommendedLocations.ifEmpty {
+                        locationsWithStatus
                             .filter { it.status == WeatherRules.STATUS_RECOMMENDED }
                             .map { it.location }
                     }
@@ -122,7 +124,7 @@ class HomeFragment : Fragment() {
                             LocationAdapter.Row(
                                 location = loc,
                                 weatherStatus = statusById[loc.id]
-                                    ?: WeatherRules.locationStatus(loc, weather.condition)
+                                    ?: WeatherRules.locationStatus(loc, weather.condition.orEmpty())
                             )
                         }
                     )
@@ -130,15 +132,16 @@ class HomeFragment : Fragment() {
 
                     // Opportunities with weather indicators
                     campusRepository.getEvents().onSuccess { events ->
-                        binding.tvNewEventsCount.text = events.size.toString()
-                        val opportunities = events.filter {
+                        val safeEvents = events.orEmpty()
+                        binding.tvNewEventsCount.text = safeEvents.size.toString()
+                        val opportunities = safeEvents.filter {
                             it.type in setOf("BURSARY", "INTERNSHIP", "WORKSHOP", "CAMPUS_EVENT", "SOCIETY_ACTIVITY")
                         }.take(5)
                         opportunitiesAdapter.submitList(
                             opportunities.map { event ->
                                 EventAdapter.Row(
                                     event = event,
-                                    weatherIndicator = WeatherRules.eventWeatherIndicator(event, weather.condition)
+                                    weatherIndicator = WeatherRules.eventWeatherIndicator(event, weather.condition.orEmpty())
                                 )
                             }
                         )
@@ -158,7 +161,7 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             campusRepository.getFavourites()
                 .onSuccess { favs ->
-                    binding.tvSavedItemsCount.text = favs.size.toString()
+                    binding.tvSavedItemsCount.text = favs.orEmpty().size.toString()
                 }
                 .onFailure {
                     // Not signed in or API down — leave placeholder
