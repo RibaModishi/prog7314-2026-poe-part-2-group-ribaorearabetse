@@ -289,7 +289,8 @@ Mount `firebase-service-account.json` via Secret Manager; do not bake it into th
 | **Events & Opportunities** | <img width="360" alt="Events" src="docs/screenshots/events.png" /> | Events from the API with outdoor weather banners |
 | **Saved Items** | <img width="360" alt="Saved Items" src="docs/screenshots/saved-items.png" /> | Bookmarks with offline queue support |
 | **App Settings** | <img width="360" alt="Settings" src="https://github.com/user-attachments/assets/dd72c00b-643c-434b-8e14-859d6915d1ce" /> | Language (`en`/`zu`/`af`), biometrics, notifications |
-| **GitHub Actions CI** | <img width="720" alt="Green CI" src="docs/screenshots/ci-green.png" /> | Backend + Android tests/APK green |
+| **GitHub Actions CI** | <img width="1505" height="932" alt="image" src="https://github.com/user-attachments/assets/ae27f6b9-cbe8-4652-947e-b59d17192f53" />
+ | Backend + Android tests/APK green |
 
 ---
 
