@@ -281,7 +281,7 @@ Below is a breakdown of the core user interface and features implemented in the 
  | Displays student details, account information, and personal preferences. |
 | **Campus Navigator (Map)** | <img width="360" alt="Campus Navigator with smart weather markers" src="docs/screenshots/campus-navigator.png" /> | Interactive campus locations with weather-aware smart markers (recommended / indoor / outdoor / less suitable). |
 | **Events & Opportunities** | <img width="360" alt="Events list with outdoor weather banners" src="docs/screenshots/events.png" /> | Campus events and opportunities from the API, with weather banners on outdoor events only. |
-| **Saved Items (Bookmarks)** | *(Paste image here)* | Personal bookmarking view with local offline caching support for quick access without network. |
+| **Saved Items (Bookmarks)** | <img width="360" alt="Saved Items" src="docs/screenshots/saved-items.png" /> | Personal bookmarking view with local offline caching support for quick access without network. |
 | **App Settings** | <img width="1080" height="2424" alt="image" src="https://github.com/user-attachments/assets/dd72c00b-643c-434b-8e14-859d6915d1ce" />
  | Application configuration options including language options, theme toggles, and notification settings. |
 | **GitHub Actions CI/CD** | <img width="1080" alt="Green Campus Companion CI run" src="docs/screenshots/ci-green.png" /> | Automated build and test pipeline — Backend tests + Android unit tests/APK both green ([run #13](https://github.com/KChabeli/campus-companion-api/actions/runs/35665939256)). |
