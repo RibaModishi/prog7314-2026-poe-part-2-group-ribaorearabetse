@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.campus_companion_prog.R
 import com.example.campus_companion_prog.data.SavedEventItem
 import com.example.campus_companion_prog.databinding.ItemSavedOpportunityBinding
 
@@ -25,7 +26,7 @@ class SavedEventAdapter(
             binding.tvOpportunityBadge.text = item.event.type.replace('_', ' ')
             binding.tvOpportunityTitle.text = item.event.title
             binding.tvOpportunityDeadline.text =
-                "Starts ${item.event.startDateTime.take(10)}"
+                binding.root.context.getString(R.string.starts_on, item.event.startDateTime.take(10))
             binding.root.setOnClickListener { onOpen(item) }
             binding.btnRemoveOpportunity.setOnClickListener { onRemove(item) }
         }

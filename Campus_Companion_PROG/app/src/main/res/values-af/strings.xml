@@ -131,5 +131,6 @@
     <string name="covered">Oortrek</string>
     <string name="open_air">Oop lug</string>
     <string name="quiet_level_value">Stilte %1$d/5</string>
+    <string name="starts_on">Begin %1$s</string>
     <string name="maps_coming">Maak kaart oop vir %1$s</string>
 </resources>

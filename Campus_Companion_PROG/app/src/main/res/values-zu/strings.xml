@@ -131,5 +131,6 @@
     <string name="covered">Kumboziwe</string>
     <string name="open_air">Emoyeni</string>
     <string name="quiet_level_value">Ukuthula %1$d/5</string>
+    <string name="starts_on">Iqala %1$s</string>
     <string name="maps_coming">Kuvula imephu ye-%1$s</string>
 </resources>

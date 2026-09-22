@@ -131,5 +131,6 @@
     <string name="covered">Covered</string>
     <string name="open_air">Open air</string>
     <string name="quiet_level_value">Quiet %1$d/5</string>
+    <string name="starts_on">Starts %1$s</string>
     <string name="maps_coming">Opening map for %1$s</string>
 </resources>
